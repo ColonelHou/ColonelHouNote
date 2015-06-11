@@ -1,0 +1,13 @@
+
+[hadoop@hadoop pig/scripts]$
+[hadoop@hadoopMaster /opt/trace/wksp/pig/scripts]$hdfs dfs -cat /pig/data/code/code.log
+15/01/09 16:08:48 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+http://zh.wikipedia.org/zh/%E6%90%9C%E7%B4%A2%E5%BC%95%E6%93%8E
+[hadoop@hadoop pig/scripts]$cat code.pig
+DEFINE DecodeURL InvokeForString('java.net.URLDecoder.decode', 'String String');
+A = LOAD '/pig/data/code/code.log' AS (url:chararray);
+B = FOREACH A GENERATE DecodeURL(url, 'UTF-8');
+STORE B INTO '/pig/data/code/output/';
+[hadoop@hadoop pig/scripts]$hdfs dfs -cat /pig/data/code/output/part-m-00000
+15/01/09 16:09:02 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+http://zh.wikipedia.org/zh/搜索引擎

@@ -1,0 +1,10 @@
+core-site.xml
+fs.trash.interval
+    1440
+    save one day(1440 min---60*24)
+注释：value值为保存时间，默认是0，单位是分钟；
+我这里设置的是保存一天；删除数据rm后，会将数据move到删除用户的.Trash目录下：
+
+删除的数据全在/user/用户名目录 下了，恢复的话直接MV到原来目录就可以了,
+hdfs dfs -ls -/user/
+/user/root/.Trash/150811080000/data/log/test.data

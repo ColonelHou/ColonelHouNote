@@ -1,0 +1,72 @@
+HDFS介绍：
+分布式文件系统，存储海量数据及大文件，Master/Slave架构
+NameNode：主节点，存储文件的元数据。
+                 如filename，文件目录结构，文件属性，以及每个文件的块列表和块所有DN。  
+DataNode：在本地文件系统存储文件块数据，以及块数据的校验和。
+Secondary NameNode：用来监控HDFS状态的辅助后台程序，每隔一段时间获取HDFS元数据的快照。
+
+MapReduce介绍：
+MapReduce流行的分布式计算框架，被设计用于并行计算海量数据。
+核心步骤主要分两部分：Map和Reduce。向框架提交一个计算作业时，
+它会把计算作业拆分成若干个Map任务，然后分配到不同节点上去执行，
+每个Map任务处理输入数据中的一部分，当Map任务完成后，它会生成一些中间文件，
+这些中间文件会作为Reduce任务的输入数据。
+Reduce是任务主要目标就是把前面若干个Map的输出汇总到一起输出。
+
+核心过程——Shuffle和Sort：
+Map输出到Reduce输入
+Map输出不是简单的写到独特好，频繁操作会导致性能严重下降，先会写到内存中一缓冲区，
+并作预排序以提升效率。每个Map任务都有一个用来写入输出数据的循环内存缓总区，这个默认100M，
+当数据超过一定阀值就会启动一个后台线程把缓冲区中内容Spill到磁盘。
+Spill前会对他进行二次排序，先根据数据所性partition排序，然后每个partition中再按key排序，
+输入一索引文件和数据文件，如果设置Combiner将在排序输出基础上进行。
+spill文件保存mapred.local.dir目录下，
+Map结束前把所有的spill文件归并为一索引文件和数据文件，
+(是否采用压缩/节省磁盘空间及网络传输)Map结束后删除。
+Reduce通过http来获取对应的数据。Map输出一般放到HDFS，
+Reduce任务输入数据分布在集群内多个Map任务输出中，多个Map可能在不同时间内完成，
+只有有一个Map完成，Reduce就开始拷贝(有多个拷贝线程,可配置)他的输出，
+Reduce怎么会知道Map结束位置？(Map结束后通知NN并上报到RM|通过心跳机制实现)，
+Reduce中有线程会间歇问RM Map输出地址。Reduce取完后不会删除Map数据，等作业运行成功后通知删除。
+
+
+MRv1缺点：
+    1.JobTracker内存消耗
+    2.集群资源利用率：M和R slot不能共享
+    3.扩展性：
+    4.只支持MapReduce框架
+
+Yarn：
+主从架构，类似于云操作系统。把Hadoop1任务调用与资源分配了。
+问题1：小公司使用Yarn吗？
+      （按照IBM观点，集群规模小于200台的称为中小规模集群，这样的公司找到90%以上）
+       可能享受不到扩展性带来的优势，但至少可以获取以下几个收益：
+       A.更快地MapReduce计算
+       B.更多框架的支持
+       C.框架升级更容易 MapReduce框架封装成一个用户程序库存放在客户端。
+ResourceManager：
+    1.处理Client请求。
+    2.启动/监控ApplicationMaster。
+    3.监控NodeManager资源。
+    4.资源分配与调度(资源的调度)。
+    5.组成部分：普通用户，管理员和Web提供了三种对外服务
+NodeManager：
+    1.单个节点上资源管理。
+    2.RM收到AM请求信息后在本地创建Container，初始化、启动监控。
+    3.处理来自ApplicationMaster命令(告诉它启用的资源在哪了)
+    4.定时给RM报告RM状态及资源使用情况。
+ApplicationMaster：
+    1.数据切分，
+    1.每个用户作业的主进程，负责管理job生命周期，包括动态增减资源使用。
+    2.为应用程序申请资源，RM发送给AM申请的封装后ContainerID,资源量等，
+      AM拿这些信息通过RPC找对应NM。
+    3.任务监控与容错
+    4.win上Q同时与几个人沟通，这需要个东西进行管理，就是类似APP Mstr。
+Container：
+    1.资源的一个包装，
+    2.对任务运行环境的抽象，封装cpu,mem等多维资源以及环境变更、启动命令等任务运行相关的信息。
+          比如：win上运行eclipse，需要mem,cpu,disk,io
+
+client提交应用给RM，给应用生成一个管理者，专门对应用进行管理(Container)，
+ 启动一个App Mstr，App Mstr会统计任务需要多少资源并向RM申请资源，
+ 告诉NM，NM分很多块进行执行，App Mstr调度跟踪监控任务的执行。

@@ -1,0 +1,9 @@
+HBase过滤器
+1.使用过滤器可以提高操作表的效率，HBase中两种数据读取函数get scan都支持过滤器，支持直接访问和通过指定起止行键访问，但是缺少细粒度的筛选功能，如基于正则表达式对行键或值进行筛选的功能。
+2.可以使用预定义好的过滤器或者是实现自定义过滤器。
+3.过滤器在客户端创建，通过RPC传送到服务端，在服务端执行过滤操作，把数据返回给客户端。
+hbase(main):009:0> scan 'Student', {STARTROW=>'j', ENDROW=>'m'}
+三类过滤器：
+1.比较过滤器(RowFilter, FamilyFilter, QualifierFilter, ValueFilter)
+2.专用过滤器(SingleColumnValueFilter, SingleColumnValueExcludeFilter, PrefixFilter, KeyOnlyFilter, FirstKeyOnlyFilter, TimestampsFilter, RandomRowFilter)
+3.附加过滤器(SkipFilter, WhileMatchFilters)

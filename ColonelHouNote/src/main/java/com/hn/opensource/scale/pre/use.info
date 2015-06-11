@@ -1,0 +1,62 @@
+def来定义一个函数。函数体是一个表达式。
+使用Block表达式的时候，默认最后一行的返回是返回值，无需显式指定。
+函数还可以像值一样，赋值给var或val。因此函数也可以作为参数传给另一个函数。
+val常量声明            val x:T   T类型  val x:T=e
+var变量声明                           同上  
+			  val x1, x2, x3等于 val x1; val x2; val 3; var x1,x2,x3:T=e等于var xn:T=e
+def函数声明           def abc(xn:T):T*=e    def add(m:Int, n:Int)=m+n
+type类型声明
+class类声明
+object对象声明
+
+基本类型： 15 0xABC 056（八进制）   1.2  1.2f  1.2e5(1.2*10的五次方) val ri=true val wr=false
+        val a = 'A'   val str = "ABCD"
+scala新版本中，取消了8进制赋值形式 val a:Int=0123
+操作符：  ==判断相等    1&2=0   1+2实际调用 .+()的方法   3^5+2   4== 1+1*2 乘高+再高等
+
+尽量少使用变量，一般使用常量。
+1 to 4 (1<=i<=4)
+1 util 4 (1<=i<=4-1)
+	for(i <- 1 to 4)
+	      println("No:" + i)
+	for(i <- 1 to 4)
+	  if(i%2 == 0)
+	    if(i !=2)
+	      print("NNOO:" + i)
+	for(i <- 1 to 4;if(i%2 == 0);if(i !=2)) //可以在这里进行嵌套循环
+	  print("NNNOOO:" + i)
+	val No=for(i <- 1 to 4)yield i
+	println(No) //Vector(1, 2, 3, 4)
+switch语句：
+    val sw = 2
+    val sw3 = 3
+    val swi = sw3 match {
+      case 1 => 888;
+      case 2 => 999;
+      case 3 => "777";
+    }
+    println(swi);
+异常处理：
+	throw new IllegalArgumentException("Error!");
+	try {
+	  
+	} catch {
+	  case t: Throwable => t.printStackTrace() // TODO: handle error
+	  case s: Throwable => s.printStackTrace() // TODO: handle error
+	}finally {
+	  xx.close()
+	}
+	def f():Int=try {
+	  1
+	} finally {
+	  2
+	}
+读取数据：
+	scala> val age=readInt()
+	scala> val name=readLine("Your name:")
+	
+return 语句表示返回某个值，但是Scala事实上无须使用return语句
+对于函数来说，其默认返回值是最后出现的一个值，不用特别注明。如需要返回的值并非最后出现时，
+   可在函数体后加上该值的标识符使之“出现”
+声明函数时使用return语句，必须声明返回值的类型，如def abd():T={return}
+break/continue在C++中非常常见的控制结构语句，但在Scala中是不必要的，可以使用布尔值类型的量通过IF语句进行控制

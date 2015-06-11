@@ -1,0 +1,8 @@
+https://github.com/motus/pig.vim
+http://www.vim.org/scripts/script.php?script_id=2186
+[hadoop@hadoop pig]$sudo cp syntax/pig.vim /usr/share/vim/vimfiles/syntax/
+[hadoop@hadoop pig]$sudo cp ftdetect/pig.vim /usr/share/vim/vimfiles/ftdetect/
+[hadoop@hadoop pig]$sudo vim/etc/vimrc
+
+
+

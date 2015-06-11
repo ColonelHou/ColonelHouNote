@@ -1,0 +1,11 @@
+如果你只需要输出一个小数据集，通常你可以使用LIMIT来实现，例如：
+
+A = LOAD '1.txt' AS (col1: int, col2: chararray);
+B = LIMIT A 5;
+DUMP B;
+Pig会只加载5条记录，就不再读取其他的记录了吗？答案是：不会。Pig将读取数据文件中的所有记录，然后再从中挑5条。这是Pig可以做优化、却没有做的一点。
+【更新】Pig 0.10已经有了这功能了：
+
+Push Limit into Loader
+Pig optimizes limit query by pushing limit automatically to the loader, thus requiring only a fraction of the entire input to be scanned.
+按我的理解，上面这段话的含义是：Pig将LIMIT查询自动优化到loader中，这样就只会扫描整个输入数据集的一部分（而不是全部）。

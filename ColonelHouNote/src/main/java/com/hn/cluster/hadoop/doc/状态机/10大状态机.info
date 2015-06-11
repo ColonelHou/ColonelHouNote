@@ -1,0 +1,8 @@
+Hadoop 2.0当前包含十个状态机，分别是：
+
+
+ResourceManager下RMApp，RMAppAttempt，RMContainer，RMNode；
+
+NodeManager下的Application，Container，LocalizedResource；
+
+MapReduce下的Job，Task，TaskAttempt。

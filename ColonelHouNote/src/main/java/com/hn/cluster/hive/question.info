@@ -1,0 +1,10 @@
+hive部署在10.20.151.7机器上，conf/hive-default.xml文件都是默认值，
+那么我们直接在浏览器中输入：http://10.20.151.7:9999/hwi/ 
+
+hive的Specified key was too long; max key length is 767 bytes问题解决
+alter database hive character set latin1;
+
+http://tech.meituan.com/hive-sql-to-mapreduce.html
+
+
+http://blog.sina.com.cn/s/blog_9f48885501017dua.html

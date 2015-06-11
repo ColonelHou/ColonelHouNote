@@ -1,0 +1,18 @@
+import os
+import zipfile
+import sys
+f = zipfile.ZipFile('msy.zip', 'w', zipfile.ZIP_DEFLATED)
+allFile = "E:\\Develop\\python\\wksp"
+os.system(allFile)
+i = 0
+for dirpath, dirnames, filenames in os.walk(allFile):
+    i = i + 1
+    print '--------------------------', i
+    print 'dirpath:', dirpath
+    print 'dirnames:', dirnames
+    print 'filenames:', filenames
+    for filename in filenames:
+        f.write(os.path.join(dirpath, filename))
+f.close
+pid = os.getpid()
+print pid

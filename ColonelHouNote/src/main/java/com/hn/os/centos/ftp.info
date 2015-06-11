@@ -1,0 +1,15 @@
+[hadoop@hadoop sa]$sudo yum install vsftpd
+[hadoop@hadoop sa]$sudo yum install ftp
+
+[hadoop@hadoop sa]$sudo /sbin/service vsftpd restart
+Shutting down vsftpd:                                      [  OK  ]
+Starting vsftpd for vsftpd:                                [  OK  ]
+
+
+[hadoop@hadoop sa]$ftp ftp.oreilly.com
+ftp> cd /published/oreilly/nutshell/sedawk_2
+ftp> binary(很重要,必须为压缩文件指定二进制传送方式)
+ftp> getprogx.tar.Z
+ftp> quit
+
+

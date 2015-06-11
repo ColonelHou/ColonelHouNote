@@ -1,0 +1,19 @@
+例如，要判断一个字符串“abc”是否包含“bc”，怎么做？
+有一个方法，利用Pig内置的INDEXOF函数来实现：
+
+INDEXOF(string, 'character', startIndex)
+string: The string to be searched.
+'character': The character being searched for, in quotes.
+startIndex: The index from which to begin the forward search. The string index begins with zero (0).
+即：string 相当于上面所说的字符串“abc”，'character'相当于上面所说的字符串“bc”，startIndex设置为0即可，表示从字符串“abc”的头开始搜索。
+如果能查到字符串，则返回值为搜索到的字符串的起始索引位置；如果查不到字符串，则返回值为-1。
+这里给一个例子。输入数据为：
+[root@localhost] ~$ cat a.txt 
+abc 123
+Pig脚本：
+A = LOAD 'a.txt' AS (col1: chararray, col2: chararray);
+B = FOREACH A GENERATE INDEXOF(col1, 'abc', 0), INDEXOF(col2, '9', 0);
+DUMP B;
+输出结果：
+(0,-1)
+可见，查不到的字符串，其返回值为-1。

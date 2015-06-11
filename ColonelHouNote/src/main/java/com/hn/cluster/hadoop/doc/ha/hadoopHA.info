@@ -1,0 +1,13 @@
+
+
+1.启动zookeeper集群（分别在datanode1、datanode2、datanode4上启动zk）
+zkServer.sh start 
+2.启动journalnode（在namenode1上启动所有journalnode,或者单独进入到datanode1,datanode2,datanode4执行） hadoop-daemons.sh start journalnode
+3.在namenode1上执行命令: hadoop namenode -format 
+格式化后会在根据core-site.xml中的hadoop.tmp.dir配置生成个文件，之后通过sbin/hadoop-daemon.sh start namenode启动namenode进程
+4.在namenode2上执行hdfs namenode -bootstrapStandby完成主备节点同步信息
+格式化ZK(在namenode1上执行即可)hdfs zkfc -formatZK
+5.启动HDFS(在namenode1上执行)start-dfs.sh
+6.启动YARN(在namenode1和namenode2上执行)tart-yarn.sh
+7.端口：http://namenode1:50070和http://namenode2:50070查看namenode分别为Active和Standby
+http://namenode1:8188, http://namenode2:8188查看状态

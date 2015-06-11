@@ -1,0 +1,139 @@
+http://www.mamicode.com/info-detail-247720.html
++
+
+
+Flume-NG中的hdfs sink的路径名(对应参数"hdfs.path"，不允许为空)以及文件前缀(对应参数"hdfs.filePrefix")支持正则解析时间戳自动按时间创建目录及文件前缀。
+
+　　在实际使用中发现Flume内置的基于正则的解析方式非常耗时，有非常大的提升空间。如果你不需要配置按时间戳解析时间，那这篇文章对你用处不大，hdfs sink对应的解析时间戳的代码位于org.apache.flume.sink.hdfs.HDFSEventSink的process()方法中，涉及两句代码：　　
+
+1 // reconstruct the path name by substituting place holders
+2         String realPath = BucketPath.escapeString(filePath, event.getHeaders(),
+3             timeZone, needRounding, roundUnit, roundValue, useLocalTime);
+4         String realName = BucketPath.escapeString(fileName, event.getHeaders(),
+5           timeZone, needRounding, roundUnit, roundValue, useLocalTime);
+　　其中，realPath是正则解析时间戳之后的完整路径名，filePath参数就是配置文件中的"hdfs.path"；realName就是正则解析时间戳之后的文件名前缀，fileName参数就是配置文件中的"hdfs.filePrefix"。其他参数都相同，event.getHeaders()是一个Map里面有时间戳(可以通过interceptor、自定义、使用hdfs sink的useLocalTimeStamp参数三种方式来设置)，其他参数是时区、是否四舍五入以及时间单位等。
+
+　　BucketPath.escapeString这个方法就是正则解析时间戳所在，具体代码我们不再分析，现在我们编写一个程序测试一下BucketPath.escapeString这个方法的性能，运行这个测试类要么在源码中：
+
+public class Test {public static void main(String[] args) {
+        HashMap<String, String> headers = new HashMap<String, String>();
+        headers.put("timestamp", Long.toString(System.currentTimeMillis()));
+        String filePath = "hdfs://xxxx.com:8020/data/flume/%Y-%m-%d";
+        String fileName = "%H-%M";
+        long start = System.currentTimeMillis();
+        System.out.println("start time is:" + start);
+        for (int i = 0; i < 2400000; i++) {
+　　　　　　　　String realPath = BucketPath.escapeString(filePath, headers, null, false, Calendar.SECOND, 1, false);
+　　　　　　　　String realName = BucketPath.escapeString(fileName, headers, null, false, Calendar.SECOND, 1, false);
+        }
+　　　　 long end = System.currentTimeMillis();
+　　　　 System.out.println("end time is:"+ end + ".\nTotal time is:" + (end - start) + " ms.");
+   }
+}
+　　这个方法后面5个参数我们一般不需要用到，因此这里其实都设置成在实际中没有影响的数值了。headers参数要有“timestamp”参数，我们这里循环处理240W个event，看看运行结果：
+
+start time is:1412853253889
+end time is:1412853278210.
+Total time is:24321 ms.
+　　我靠，居然花了24s还多，尼玛要知道哥目前白天的数据量也就是每秒4W个event，这还不是峰值呢。。。加上解析时间戳全量就扛不住了，怎么办？？
+
+　　能怎么办啊？只能想办法替换这个解析办法了，于是，我就想到这样了，看测试程序：
+
+public class Test {
+
+    private static SimpleDateFormat sdfYMD = null;
+    private static SimpleDateFormat sdfHM = null;
+    
+    public static void main(String[] args) {
+        
+        sdfYMD = new SimpleDateFormat("yyyy-MM-dd");
+        sdfHM = new SimpleDateFormat("HH-mm");
+        HashMap<String, String> headers = new HashMap<String, String>();
+        headers.put("timestamp", Long.toString(System.currentTimeMillis()));
+        String filePath = "hdfs://dm056.tj.momo.com:8020/data/flume/%Y-%m-%d";
+        String fileName = "%H-%M";
+        long start = System.currentTimeMillis();
+        System.out.println("start time is:" + start);
+        for (int i = 0; i < 2400000; i++) {
+            //String realPath = BucketPath.escapeString(filePath, headers, null, false, Calendar.SECOND, 1, false);
+            //String realName = BucketPath.escapeString(fileName, headers, null, false, Calendar.SECOND, 1, false);
+            
+            String realPath = getTime("yyyy-MM-dd",Long.parseLong(headers.get("timestamp")));
+            String realName = getTime("HH-mm",Long.parseLong(headers.get("timestamp")));
+        }
+        long end = System.currentTimeMillis();
+        System.out.println("end time is:"+ end + ".\nTotal time is:" + (end - start) + " ms.");
+    }
+
+    public static String getTime(String format,long timestamp) {
+        String time="";
+        if(format.equals("HH-mm"))
+            time=sdfHM.format(timestamp);
+        else if(format.equals("yyyy-MM-dd"))
+            time=sdfYMD.format(timestamp);        
+        return time;
+    }
+}
+　　我们使用java自己的SimpleDateFormat来完成按指定格式的解析，这样就不能将整个path或者name传进去了，看看运行结果：
+
+start time is:1412853670246
+end time is:1412853672204.
+Total time is:1958 ms.
+　　尼玛！！！不是吧，不到2s。。。我这是在我的MBP上测试的，i5+8G+128G SSD，骚年你还犹豫什么呢？
+
+　　来开始改动源码吧。。。
+
+　　我们最好把解析格式做成可配置的，并且最好还保留原来的可以加前缀名的方式，因为有可能需要加入主机名啊什么的，但是可以把这个前缀作为中缀，解析时间戳的结果作为前缀。。。
+
+　　1、我们需要两个SimpleDateFormat来分别实现对path和name的格式化，并在配置时完成实例化，这样可以创建一次对象就Ok，还需要path和name的格式化串，这个可以做成全局的或者局部的，我们这是全局的(其实没有必要，是不是？哈哈)，变量声明阶段代码：
+
+　　 private SimpleDateFormat sdfPath = null;        //for file in hdfs path
+    private SimpleDateFormat sdfName = null;        //for file name prefix
+
+    private String filePathFormat;
+    private String fileNameFormat;
+　　2、configure(Context context)方法中需要对上述对象进行配置了，很简单，很明显，相关代码如下：
+
+1 　　　　 filePath = Preconditions.checkNotNull(
+2                 context.getString("hdfs.path"), "hdfs.path is required");
+3         filePathFormat =  context.getString("hdfs.path.format", "yyyy/MM/dd");        //time‘s format ps:"yyyy-MM-dd"
+4         sdfPath = new SimpleDateFormat(filePathFormat);
+5         fileName = context.getString("hdfs.filePrefix", defaultFileName);
+6         fileNameFormat = context.getString("hdfs.filePrefix.format", "HHmm");
+7         sdfName = new SimpleDateFormat(fileNameFormat);
+　　增加的是上面的3、4、6、7四行代码，解析格式串是在"hdfs.path.format"和"hdfs.filePrefix.format"中进行配置，其它的地方不要存在时间戳格式串了，也不要出现原来内置的那些%H、%mm等等格式了。上面两个format配置有默认格式串，自己做决定就好。
+
+　　3、增加解析时间戳方法：
+
+1     public String getTime(String type,long timestamp) {
+2         String time="";
+3         if(type.equals("name"))
+4             time=sdfName.format(timestamp);
+5         else if(type.equals("path"))
+6             time=sdfPath.format(timestamp);
+7         return time;
+8     }
+　　参数type用来指定是文件名的还是路径名的，用来调用相应地格式化对象。
+
+　　4、下面是重点了，上面几步即使配置了，不在这修改也不会起任何作用，修改process()方法，用以下代码替换最上面提到的两行代码：
+
+1                 String realPath = filePath;
+2                 String realName = fileName;
+3                 if(realName.equals("%host") && event.getHeaders().get("host") != null)
+4                     realName = event.getHeaders().get("host").toString();
+5                 if(event.getHeaders().get("timestamp") != null){
+6                     long time = Long.parseLong(event.getHeaders().get("timestamp"));
+7                     realPath += DIRECTORY_DELIMITER + getTime("path",time);
+8                     realName = getTime("name",time) + "." + realName;
+9                 }        
+　　这几行的逻辑其实有：A、可以自定义中缀("hdfs.filePrefix"，可以是常量或者是"%host"，后者用来获取主机名，前提是要设置hostinterceptor)；B、默认中缀就是默认的"FlumeData"；C、如果headers中存在时间戳，调用getTime方法解析时间戳。
+
+　　5、编译&打包&替换&运行。。。
+
+ 　　哥打包比较原始，因为只修改了一个类，就把编译后的class文件以HDFSEventSink开头的几个class文件替换了原来flume-hdfs-sink的jar包中的对应的class文件。。。尼玛，原始吧。。。会maven，直接上maven吧。。。
+
+ 
+
+　　我这边的测试结果是如果没有配置压缩功能，性能提升超过70%，如果配置上压缩功能(gzip)性能提升超过50%，这数值仅供参考，不同环境不同主机不同人品可能不尽相同。。
+
+　　期待大伙的测试结果。。。

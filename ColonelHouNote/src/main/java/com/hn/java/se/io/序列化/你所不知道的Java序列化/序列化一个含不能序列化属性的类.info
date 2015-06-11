@@ -1,0 +1,12 @@
+http://hxraid.iteye.com/blog/461935
+重写以下两个方法:
+
+//对ZipFile中的文件名进行序列化，因为它是String类型的  
+private void writeObject(ObjectOutputStream out)throws IOException{  
+    out.writeObject(zf.getName());  
+}  
+//对应的，反序列化过程中JVM也会检查类似的一个私有方法。  
+private void readObject(ObjectInputStream in)throws IOException,ClassNotFoundException{  
+    String filename=(String)in.readObject();  
+    zf=new ZipFile(filename);  
+}  

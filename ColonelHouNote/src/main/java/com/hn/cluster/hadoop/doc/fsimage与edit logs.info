@@ -1,0 +1,29 @@
+SNN：检查点节点
+它是在NameNode启动后   编辑日志文件
+fsimage - 它是在NameNode启动时对整个文件系统的快照， 存于硬盘的元数据检查点。
+          Hadoop不会对每个文件操作都写出到fsimage，这样是很慢的，
+                    但是每个文件操作都会在提交后运行前先写入edits编辑日志，这样在namenode出现故障后，
+                    就会将fsimage和edits编辑日志结合读入内存，重建元数据信息。
+
+
+条件：只有在名称节点（NameNode）重启的时候才会合并fsimage和edits log。
+	checkpoint可以解决重启NameNode时间过长的弊端
+
+问题：
+  1.NN一直不重启，edit logs文件会变的很大，怎么去管理这个文件是一个挑战。
+  2.NameNode的重启会花费很长时间，因为有很多改动[笔者注:在edit logs中]要合并到fsimage文件上。
+  3.如果NameNode挂掉了，那我们就丢失了很多改动因为此时的fsimage文件非常旧。
+  [笔者注: 笔者认为在这个情况下丢失的改动不会很多, 因为丢失的改动应该是还在内存中但是没有写到edit logs的这部分。]
+  
+SNN作用：为了避免edits编辑日志的无限制扩大，
+        secondary NameNode 就回按照时间阈值（比如1小时）或者
+                按大小阈值（edits编辑日志文件大小超过64M，这些参数都可以设置）“周期性”
+                的读取NameNode中的edits和FsImage重构FsImage检查点，
+作用过程：
+1.首先，它定时到NameNode去获取edit logs，并更新到fsimage上。[笔者注：Secondary NameNode自己的fsimage]
+2.一旦它有了新的fsimage文件，它将其拷贝回NameNode中。
+3.NameNode在下次重启时会使用这个新的fsimage文件，从而减少重启的时间。
+
+什么时候checkpiont？？
+fs.checkpoint.period 指定两次checkpoint的最大时间间隔，默认3600秒。
+fs.checkpoint.size   规定edits文件的最大值，一旦超过这个值则强制checkpoint，不管是否到达最大时间间隔。默认大小是64M。

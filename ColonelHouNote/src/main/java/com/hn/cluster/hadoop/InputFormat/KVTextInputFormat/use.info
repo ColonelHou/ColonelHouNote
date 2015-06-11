@@ -1,0 +1,5 @@
+Configuration conf = new Configuration();
+Job job = new Job(conf,"MyJob");
+//注意新旧API不一样
+conf.set("mapreduce.input.keyvaluelinerecordreader.key.value.separator", ",");
+job.setInputFormatClass(KeyValueTextInputFormat.class);

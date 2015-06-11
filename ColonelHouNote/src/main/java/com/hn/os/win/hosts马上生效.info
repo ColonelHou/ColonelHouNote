@@ -1,0 +1,5 @@
+ipconfig /displaydns
+//显示DNS缓存内容
+ipconfig /flushdns
+//删除DNS缓存内容
+这样，系统就会清空本机的DNS缓存，从而不必重启，就能使Hosts文件生效。

@@ -1,0 +1,4 @@
+34. MapReduce大致流程？
+35. combiner, partition作用？
+36.用mapreduce实现sql语句 select count(x) from a group by b？
+36. 用mapreduce如何实现两张表连接，有哪些方法？

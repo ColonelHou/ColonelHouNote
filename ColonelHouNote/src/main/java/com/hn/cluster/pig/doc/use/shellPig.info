@@ -1,0 +1,15 @@
+[hadoop@hadoop ~]$hdfs dfs -cat /pig/data/shellPig/shellPig.log
+15/01/09 15:00:03 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+1 5 98 = 7
+34 8 6 3 2
+62 0 6 = 65
+[hadoop@hadoop ~]$cat //opt/trace/wksp/pig/scripts/shellPig.pig
+A = LOAD '/pig/data/shellPig/shellPig.log' USING PigStorage(' ') AS (col1:int, col2:int, col3:int, col4:chararray, col5:int);
+--②通过“STREAM … THROUGH …”的方式，我们可以调用一个shell语句，用该shell语句对A的每一行数据进行处理。
+B = STREAM A THROUGH `awk '{if($4 == "=") print $1" "$2" "9999" "$5; else print $0}'`;
+STORE B INTO '/pig/data/shellPig/output/';
+[hadoop@hadoop ~]$hdfs dfs -cat /pig/data/shellPig/output/part-m-00000
+15/01/09 15:00:33 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+1 5 9999 7
+34 8 6 3 2
+62 0 9999 65

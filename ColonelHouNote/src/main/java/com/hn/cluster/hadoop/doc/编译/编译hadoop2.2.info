@@ -1,0 +1,15 @@
+http://mirrors.hust.edu.cn/apache/hadoop/common/hadoop-2.2.0/hadoop-2.2.0-src.tar.gz
+maven源设置【在<mirrors></mirros>里添加】
+# vim /usr/local/maven/conf/settings.xml
+<mirror>
+    <id>nexus-osc</id>
+    <mirrorOf>*</mirrorOf>
+    <name>Nexusosc</name>
+    <url>http://maven.oschina.net/content/groups/public/</url>
+</mirror>
+# tar xvzf hadoop-2.2.0-src.tar.gz
+# cd hadoop-2.2.0-src
+# mvn clean install -DskipTests
+# mvn package -Pdist,native -DskipTests -Dtar
+## 编译成功后，生成的二进制包所在路径
+hadoop-dist/target/hadoop-2.2.0

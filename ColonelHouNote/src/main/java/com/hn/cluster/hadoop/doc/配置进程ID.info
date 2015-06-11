@@ -1,0 +1,2 @@
+export HADOOP_PID_DIR=/usr/local/src/hadoop-2.6.0/logs
+export YARN_PID_DIR=/usr/local/src/hadoop-2.6.0/logs

@@ -1,0 +1,26 @@
+什么是RPC？
+   1.RPC采用了C/S的模式 
+   2.Client端发送一个带有参数的请求信息到Server端
+   3.Server接收到这个请求以后，根据发送过来的参数调用相应
+           的程序，然后把自己计算好的结果发送给Client端。
+   4.Client端润滑刚才结果发继续运行。
+RPC特点 ？
+   1.透明性：远程调用其他机器上程序，对用户来说就像调用本地方法一样。
+   2.高性能：RPC Server能够并发处理多个来自Client的请求。
+   3.可控性：JDK中已经提供了一个RPC框架-RMI，但是该RPC框架过于重量级
+                        并且可控之处比较少，所以Hadoop RPC实现了自定义的RPC框架。
+RPC机制：
+   1.序列化层：Client与Server端通讯传递的信息采用了Hadoop里提供的序列化类或自定义Writable类型
+   2.函数调用层：Hadoop RPC通过动态代理以及Java反射机制实现函数调用
+   3.网络传输层：Hadoop RPC采用了基于TCP/IP的Socket机制
+   4.服务端框架层：RPC Server利用JAVA NIO以及采用了事件鸡翅的IO模型，提高 RPC　Server的并发处理能力。
+   
+该RPC框架要求调用的参数和返回结果必须是Java的基本类型，String和Writable接口的实现类，以及元素为以上类型的数组。
+
+http://bbs.hadoopor.com/thread-329-1-2.html
+Hadoop RPC详细分析 
+
+RPC.java、Client.java、Server.java，
+1.其中RPC类主要是提供对外服务的函数实现动态代理机制，
+2.Client是RPC进行服务的函数，主要是连接服务器、传递函数名和相应的参数、等待结果返回，
+3.Server主要接受Client的请求、执行相应的函数、返回结果。   

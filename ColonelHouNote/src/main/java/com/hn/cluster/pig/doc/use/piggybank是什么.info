@@ -1,0 +1,2 @@
+ 说白了就是Apache把大家写的自定义函数放在一块儿，起了个名字，就叫做piggybank。你可以把它理解为一个SVN代码仓库。
+ 具体请看这里(https://cwiki.apache.org/confluence/display/PIG/PiggyBank)。

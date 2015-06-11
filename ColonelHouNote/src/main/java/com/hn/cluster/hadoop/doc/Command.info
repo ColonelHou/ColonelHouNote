@@ -1,0 +1,1 @@
+如果是core-site.xml，那么可以使用 hadoop dfsadmin -refreshNodes，如果是其它的话，估计就不行了

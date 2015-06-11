@@ -1,0 +1,18 @@
+下面举一个例子。假设有数据文件：
+[root@localhost ~]# cat a.txt 
+2010-05-06  abc
+2008-06-18  uio
+2011-10-11  tyr
+2010-12-23  fgh
+2011-01-05  vbn
+第一列是日期，现在要找出所有不重复的年份有哪些，可以这样做：
+A = LOAD 'a.txt' AS (dateStr: chararray, flag: chararray);
+B = FOREACH A GENERATE SUBSTRING(dateStr, 0, 4);
+C = DISTINCT B;
+DUMP C;
+输出结果为：
+(2008)
+(2010)
+(2011)
+可见达到了我们想要的效果。
+上面的代码太简单了，不必多言，唯一需要说明一下的是 SUBSTRING 函数，它的第一个参数是要截取的字符串，第二个参数是起始索引（从0开始），第三个参数是结束索引。

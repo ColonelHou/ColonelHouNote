@@ -1,0 +1,34 @@
+方法1:
+A ＝LOAD 'input';
+STORE A INTO 'output' USING com.twitter.elephantbird.pig.store.LzoPigStorage();
+
+
+方法2：
+在Pig脚本的最前面添加两句话：
+set mapred.output.compression.codec 'com.hadoop.compression.lzo.LzopCodec';
+set mapred.output.compress 'true';
+
+
+
+如何输出 gz 及 bz2 压缩格式的文件
+
+are not auto-detected on loading.
+说得简单点就是：当你把保存的目录名设置为以 .bz2 或 .gz 结尾时，输出的文件就自动会被压缩为对应的文件格式。
+因此，我就有了下面这两段极其简单的示例代码：
+--压缩率稍低
+A = LOAD '1.txt';
+STORE A INTO 'z.gz';
+ 
+--压缩率较高
+A = LOAD '1.txt';
+STORE A INTO 'z.bz2';
+正如上面的注释所示，bz2 的压缩率比 gz 高。
+最后生成的目录下，文件名类似于：
+part-m-00000.gz
+part-m-00001.gz
+part-m-00002.gz
+如果是 bz2，则后缀名为 .bz2。
+
+有人可能觉得这种通过目录名实现的方式不直观，那么你也可以在Pig脚本中指定输入文件的压缩格式。下面的例子演示了如何输出gzip格式的压缩文件（此时，目录名就不用以.gz结尾了）：
+set output.compression.enabled true;
+set output.compression.codec org.apache.hadoop.io.compress.GzipCodec;

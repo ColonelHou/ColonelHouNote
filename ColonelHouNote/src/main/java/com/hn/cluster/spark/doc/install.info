@@ -1,0 +1,5 @@
+
+http://archive.cloudera.com/cdh5/cdh/5/hadoop-2.6.0-cdh5.4.0.tar.gz
+Apache Maven 3.0.5 
+Java version: 1.7.0_80
+./make-distribution.sh --name spark-1.3.0.compile --tgz -Phadoop-2.6 -Dhadoop.version=2.6.0-cdh5.4.0 -Pyarn

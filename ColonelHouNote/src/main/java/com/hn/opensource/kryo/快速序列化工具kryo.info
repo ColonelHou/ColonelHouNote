@@ -1,0 +1,118 @@
+http://jackyrong.iteye.com/blog/1920878
+
+
+kryo是个高效的Java序列化库，kryonet是一个基于kryo的RPC库，使用TCP和UDP通讯，目前不支持http协议。 
+
+优点： 
+
+    速度快！见https://github.com/eishay/jvm-serializers/wiki/Staging-Results 
+
+    支持互相引用，比如类A引用类B，类B引用类A，可以正确地反序列化。 
+
+    支持多个引用同一个对象，比如多个类引用了同一个对象O，只会保存一份O的数据。 
+
+    支持一些有用的注解，如@Tag，@Optional。 
+
+    支持忽略指定的字段。 
+
+    支持null 
+
+    代码入侵少 
+
+    代码比较简法（比起msgpack，少得多） 
+
+缺点： 
+
+    bug多 2.12，2.14都有bug 
+
+    文档比较少，有些使用方法要看代码才能理解，最新版2.14有bug，不能正确反序列化map类型。 
+
+    不是跨语言的解决方案 
+
+    貌似每一个类都要注册下，不然只能用writeClassAndObject和readClassAndObject函数。 
+
+    类要有一个空的构造函数，不然不能序列化。 
+
+
+----------------------------------------------------------------------------- 
+简单例子,见: 
+http://howwish2011.iteye.com/blog/1568164 
+
+摘录下 
+static private void bean3() { 
+Kryo kryo = new Kryo(); 
+// kryo.setReferences(true); 
+                // kryo.setRegistrationRequired(true); 
+// kryo.setInstantiatorStrategy(new StdInstantiatorStrategy()); 
+//注册类 
+Registration registration = kryo.register(Student.class); 
+long time = System.currentTimeMillis(); 
+for (int i = 0; i < 100000; i++) { 
+//序列化 
+Output output = null; 
+// ByteArrayOutputStream outStream = new ByteArrayOutputStream(); 
+//output = new Output( outStream , 4096); 
+output = new Output(1, 4096); 
+Student student = new Student("zhangsan", "man", 23); 
+kryo.writeObject(output, student); 
+byte[] bb = output.toBytes(); 
+// System.out.println(bb.length); 
+output.flush(); 
+
+//反序列化 
+Input input = null; 
+// input = new Input(new 
+        // ByteArrayInputStream(outStream.toByteArray()),4096); 
+input = new Input(bb); 
+Student s = (Student) kryo.readObject(input, registration.getType()); 
+System.out.println(s.getName()+","+s.getSex()); 
+input.close(); 
+} 
+time = System.currentTimeMillis() - time; 
+System.out.println("time:" + time); 
+} 
+
+       序列化的速度比java更快，更是在缓存区占用更少。 
+
+
+bean类： 
+
+package com.test; 
+
+import java.io.Serializable; 
+
+public class Student implements Serializable{ 
+private String name; 
+private String sex; 
+private int age; 
+
+public Student() { 
+} 
+
+public Student(String name, String sex, int age) { 
+super(); 
+this.name = name; 
+this.sex = sex; 
+this.age = age; 
+} 
+
+public String getName() { 
+return name; 
+} 
+
+
+public String getSex() { 
+return sex; 
+} 
+
+public int getAge() { 
+return age; 
+} 
+} 
+
+更多不错的文章介绍: 
+一个多个序列化框架的对比:http://x-rip.iteye.com/blog/1555293 
+
+两篇原理介绍文: 
+http://x-rip.iteye.com/blog/1555344 
+http://blog.csdn.net/hengyunabc/article/details/7764509

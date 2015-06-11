@@ -1,0 +1,19 @@
+http://piwik.org/docs/optimize/
+Table of contents
+What infrastructure do I need to run Piwik?
+Configure Piwik for speed
+Meet other Piwik Power users & Share your experience
+Get Professional Support by the Best Piwik Experts
+In the last two years, we have made many improvements to the code and Piwik can now easily track millions of pages and events and manage thousands of websites.
+
+While Piwik can scale to millions of pages, it is also very efficient to run on a smaller scale, for example on a shared hosting account.
+
+Piwik is a Web Analytics platform designed for speed.
+
+What infrastructure do I need to run Piwik?
+
+if your websites have less than 1,000 pages or events per day (less than 30,000 per month), Piwik works on most hosting even the cheapest ones.
+if your websites have less than 10,000 pages or events per day (less than 300,000 per month), Piwik works well on fast shared hosting and virtual servers.
+if your websites have more than 100,000 pages or events per day (more than 3 million per month), you may need virtual server or dedicated hosting or Piwik Cloud
+Piwik will work well up to 50 million pages or events per month, and we know of several websites with 100 million pageviews per month (and more!) using Piwik with great success. We hope to see many more power users use Piwik in the future.
+You may also be interested in the Data Limits in Piwik fact sheet.

@@ -1,0 +1,17 @@
+1.下载eclipse的linux版本
+eclipse最新版kepler的linux 64位 的下载地址是 http://www.eclipse.org/downloads/download.php?file=/technology/epp/downloads/release/kepler/SR1/eclipse-jee-kepler-SR1-linux-gtk-x86_64.tar.gz&mirror_id=1082
+然后在hadoop的源代码目录/usr/local/hadoop-2.2.0-src下，创建一个文件eclipseReload.sh，修改文件内容如下：
+#!/bin/sh
+mvn clean compile
+mvn eclipse:clean
+mvn eclipse:eclipse
+保存退出。
+对该文件执行以下命令
+chmod +x eclispseReload.sh
+赋予执行权限，然后执行该文件。过一段时间，就会自动生成eclipse项目的结构。
+2.导入eclipse
+打开eclipse，选择import maven projects，出现如下图所示，点击Browse… 选择hadoop源码根目录，就可以导入各个项目，竟然后54个项目。
+导入之后，eclipse会编译很长时间的，编译过后，出现一堆错误。我们可以关闭eclipse的maven插件，使用如下方法关闭。
+右键项目——maven-Disable Maven Nature
+等着把这些东西搞定后，然后看看只有hadoop-common编译不通过，看了一下代码是包org.apache.hadoop.ipc.protobuf下面缺少类，而在其他地方竟然使用了其中的类，既然是test部分的代码，我们可以根据eclipse提示自己创建一些类，编译通过。不要删除这些类，因为其他项目也引用了，删来删去很麻烦。
+至此，整个项目就编译通过了，如下图所示。

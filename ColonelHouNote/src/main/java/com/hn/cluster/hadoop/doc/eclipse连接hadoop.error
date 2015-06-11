@@ -1,0 +1,27 @@
+在eclipse中连接hadoop调试的时候出现下面的Exception:
+ 
+[main] ERROR Configuration : Failed to set setXIncludeAware(true) for parser org.apache.xerces.jaxp.DocumentBuilderFactoryImpl@143ed74:java.lang.UnsupportedOperationException: This parser does not support specification "null" version "null" java.lang.UnsupportedOperationException: This parser does not support specification "null" version "null" at javax.xml.parsers.DocumentBuilderFactory.setXIncludeAware(Unknown Source) at org.apache.hadoop.conf.Configuration.loadResource(Configuration.java:1275) at org.apache.hadoop.conf.Configuration.loadResources(Configuration.java:1251) at org.apache.hadoop.conf.Configuration.getProps(Configuration.java:1192) at org.apache.hadoop.conf.Configuration.get(Configuration.java:415) at org.apache.hadoop.hbase.HBaseConfiguration.checkDefaultsVersion(HBaseConfiguration.java:63) at org.apache.hadoop.hbase.HBaseConfiguration.addHbaseResources(HBaseConfiguration.java:76) at org.apache.hadoop.hbase.HBaseConfiguration.create(HBaseConfiguration.java:86)
+
+
+解决方法：在JVM启劝参数中增加：
+-Djavax.xml.parsers.DocumentBuilderFactory=com.sun.org.apache.xerces.internal.jaxp.documentbuilderfactoryimpl
+再设置两个属性(javax.xml.parsers.DocumentBuilderFactory,javax.xml.parsers.SAXParserFactory)值如下: 
+Java代码  收藏代码
+System.setProperty("javax.xml.parsers.DocumentBuilderFactory",  
+    "com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl");  
+System.setProperty("javax.xml.parsers.SAXParserFactory",  
+    "com.sun.org.apache.xerces.internal.jaxp.SAXParserFactoryImpl");
+    
+    
+http://stackoverflow.com/questions/19438682/apache-hadoop-setxincludeaware-unsupportedoperationexception
+In my case it was outdated Maven component dependency on xerces-impl 2.4.0 (due to mockrunner 1.0.3 used on test phase). Following managed dependency added to <dependencyManagemen> section helped.
+
+<dependencyManagement>
+    <dependencies>
+        <dependency>
+            <groupId>xerces</groupId>
+            <artifactId>xercesImpl</artifactId>
+            <version>2.11.0</version>
+        </dependency>
+    </dependencies>
+</dependencyManagement>

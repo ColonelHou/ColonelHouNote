@@ -1,0 +1,14 @@
+class Employee implements Serializable{  
+         private ZipFile zf=null;  
+         Employee(ZipFile zf){  
+                this.zf=zf;  
+         }   
+}  
+  
+ObjectOutputStream oout=  
+new ObjectOutputStream(new FileInputStream(new File("aaa.txt")));  
+oout.writeObject(new Employee(new ZipFile("c://.."));  
+ 我们会发现运行之后抛出java.io.NotSerializableException : java.util.zip.ZipFile 。
+ 很明显，如果要对Employee对象序列化，就必须对其数据域ZipFile对象也进行序列化，
+ 而这个类在JDK中是不可序列化的。因此，包含了不可序列化的对象域的对象也是不能序列化的。 
+ 实际上，这也并非不可能，我们在下面第6点会谈到。

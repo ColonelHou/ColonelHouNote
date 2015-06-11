@@ -1,0 +1,79 @@
+1.修改文件名
+  mv a  b 重命名文件夹
+2.查找某个目录下包含此字符串文件行， 并输出到日志中
+  grep "abc"  * -r >> log
+3.$1   参数的开始
+  $0   脚本名称
+  $#   参数个数
+  $?   最后退出状态命令
+  $$   执行此脚本的进程ID
+4.不停的去读取最新的内容
+  tail -f 文件
+5.pon dsl-provider/poff dsl-provider  联网与断网
+6.date +%Y-%m-%d_%T  时间及日期显示：2013-02-18_19:53:23
+7.whoami   当前登录的用户
+8.cal显示日历
+9.ls 前三个：文件属主 可读 写执行 
+     中三个：组用户可读 写  执行
+     后三个：其他用户 写 执行
+10.pwd当前工作目录
+11.whereis 命令    查看这个命令地方
+12.find /~. -name "*.txt" -print  根目录  home目录  当前目录 
+   find /   -type d -print  所有的目录 
+   find .!  -type d -print  除目录以外所有的文件
+   find /   -user root -print 按文件属主查找文件
+   find /   -newer tmp -print 查找更改时间在比tmp文件新的文件 
+   find / -name "xxx" -type d  查找某个目录
+   locate 命令也可以查找
+13.终端在线下载文件
+root@debian:/usr/local/src# sudo wget -O mysql-5.1.51.tar.gz http://mdl1.mydown.yesky.com/soft/201010/mysql-5.1.51.tar.gz
+14.将 rpm 包转换为 deb 包
+   A. 先安装 alien 和 fakeroot 这两个工具
+     sudo apt-get install alien fakeroot
+   B.  使用 alien 将 rpm 包转换为 deb 包：
+     fakeroot alien package.rpm
+   C.转换成功，我们可以即刻使用以下指令来安装：
+      sudo dpkg -i package.deb
+－－－－－－－－输入输出－－－－－－－－－－－－－
+echo read cat 管道 tee 重定向
+--------------------------------------------------
+13.sudo -l 列出当前用户可执行的命令
+14.测试数值
+   －eq 
+   －ne
+   －gt 大于
+   －lt 小于
+   －le小于等于
+   －ge大于等于
+15.logname 当前执行该脚本的用户
+16.unset  从shell内存中删除变量或者函数
+挂载Windows分区
+[code="java"]
+首先得确定你所用的Linux系统的locale
+中文Linux 常用的locale是zh_CN.gb2312，zh_CN.gbk，zh_CN.gb18030 和 zh_CN.UTF-8
+卸载分区:
+root@debian:/opt/software/E# umount /dev/sda6
+
+卸载分区时提示分区繁忙（device is busy），可以先用下面的命令看看哪个进程在使用此分区：
+root@debian:/opt/software/E# fuser -cu /dev/sda6
+/dev/sda6: 5433m(cck)
+此命令看这个进程对应的程序名字：
+ps 5433
+命令结束此进程： 
+kill -9 5433
+==============自动挂载  
+把以上的命令写入/etc/fstab文件中
+root@debian:/etc# vim fstab
+/dev/hda9 / ext3 defaults 0 1 
+/dev/hda13 none swap sw 0 0 
+/dev/hdc /media/cdrom iso9660 ro,user,noauto 0 0 
+/dev/fd0 /media/floppy auto rw,user,noauto 0 0 
+/dev/hda10 /mnt/debian ext3 defaults 0 0 
+/dev/hda1 /mnt/C ntfs utf8,umask=022 0 0 
+/dev/hda5 /mnt/D vfat utf8,umask=0 0 0 
+如下图：我把自己win系统下的E盘挂载进来了
+
+
+
+
+gg->dG 清空vim内容

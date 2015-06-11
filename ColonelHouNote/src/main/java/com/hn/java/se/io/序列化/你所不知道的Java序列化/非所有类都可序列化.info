@@ -1,0 +1,5 @@
+我们都知道凡要序列化的类都必须实现Serializable接口。 但是不是所有类都可以序列化呢？当然不是这样，想想看序列化可以让我们轻而易举的接触到对象的私有数据域，这是多么危险的漏洞呀！总结一下，JDK中有四种类型的类对象是绝对不能序列化的 。
+     (1) 太依赖于底层实现的类(too closely tied to native code)。比如java.util.zip.Deflater。 
+     (2) 对象的状态依赖于虚拟机内部和不停变化的运行时环境。比如java.lang.Thread, java.io.InputStream
+     (3) 涉及到潜在的安全性问题。比如：java.lang.SecurityManager, java.security.MessageDigest
+     (4) 全是静态域的类，没有对象实例数据。要知道静态域本身也是存储在方法区中的。

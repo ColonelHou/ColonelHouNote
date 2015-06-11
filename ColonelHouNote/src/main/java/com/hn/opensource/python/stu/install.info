@@ -1,0 +1,16 @@
+python for linux
+https://www.python.org/ftp/python/2.7.8/Python-2.7.8.tgz
+sudo ./configure
+sudo make 
+sudo make install
+which python
+touch hello.py
+vim hello.py
+print "hello world"
+python hello.py
+python -V  查看版本
+
+安装好的查看doc
+http://localhost:7464/
+python Simple Course pdf
+http://www.chuanke.com/?mod=student&act=study&courseid=107297  网络爬虫

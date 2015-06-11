@@ -1,0 +1,41 @@
+HadoopRPC四部分:
+      1.序列化层, 
+      2.函数调用层(动态代理+反射), 
+      3.网络传输层(TPC/IP的Socket机制), 
+      4.服务器端处理框架(事件驱动IO模型/事件驱动Reactor设计模式-扩展性和并发能力)
+HadoopRPC对外提供两种接口：
+1.构造客户端代理对象用于向服务器端发送RPC请求。
+2.为某个协议实例构造一个服务器对象，用于处理客户端发送的请求。
+
+使用步骤：
+  1.定义RPC协议。RPC协议是Client和Server之间通信接口，它定义了Server端对外提供的服务接口。
+  2.实现RPC协议。
+  3.构造并启动RPC Server。
+  4.构造RPC Client并发送RPC请求
+HadoopRPC三大类组成：RPC(对外编程接口)、Client(客户端实现)、Server(服务端实现)。
+  1.Client有两个重要的内部类：
+    A.Call(封装RPC请求[唯一标识，调用信息param])
+    B.Connection(Client与每个Server维护一个通信连接。
+      包与Server端通信的Socket，网络输入/出数据流, 保存RPC请求的哈希表|addCall)。
+    C.流程：将远程方法调用信息封装成Call对象放入Connection对象的哈希表calls中，调用其sendParam将Call对象发送给Server端，Server处理后将结果返回给Client，Client通过receiveResponse函数获取，Client检查结果处理状态(成功还是失败)，并将对应Call对象从哈希表中删除。
+  2.Server中Listener、Reader、Handler、Responder。
+    A.Server是单点，设计目标是高并发和可扩展性。
+    B.使用线程池和基于事件驱动Reactor设计模式。
+    C.Server处理过程分为三阶段：
+      a.接收请求 = 接收请求Listener + 处理请求Reader
+          整个Server只有一个Listener线程，统一负责监听来自客户端连接请求。一旦有新请求到达就会采用办公轮询方式从线程池中选择一个Reader线程进行处理。Listener和Reader线程内部各自包含一个Selector对象，分别监听SelectionKey.OP_ACCEPT和OP_READ事件。Reader监听客户端连接中是否有新RPC请求到达，并封装成Call对象放到共享队列callQueue中。
+      b.处理请求：从共享队列callQueue中获取Call对象，执行对应函数调用 ，并返回给Client。同时存在多个Handler线程。从callQueue中读取Call对象——>函数调用——>将结果返回给对应Client。当结果很大或网络异常，此时将尝试将后续发送任务交给Responder线程。
+      c.返回结果：Server端只有一个Responder线程。内部有Selectorcf对象，用于监听SelectionKey.OP_WRITE事件。当Handler没能将结果一次性发送到客户端，会向该Selector对象注册此事件，进而由Responder线程采用异步方式继续发送未发送完成的结果。
+HadoopRPC使用了JAVA动态代理完成对远程方法的调用。用户只需要实现InvocationHandler接口，按自己需求实现invoke方法即可完成动态代理类对象上的方法调用。RPC做法是在invoke方法中将函数调用信息打包成可序列化Invocation对象，并通过网络发送给服务端，服务端收到该调用信息后，解析出函数名与函数参数列表等信息，利用JAVA反射机制完成函数调用。
+
+
+RPC参数调优：
+一：Reader线程数据：默认是1.一个RPC Server只包含一个Reader线程。
+二：Handler线程数目：默认是10
+三：每个Handler线程对应的最大Call数目。默认是100.
+四：客户端最大重试次数：默认是10.分布式下，困网络故障或其他原因近使客户端重试连接是很常见的，但尝试多不利于对实时性要求高的应用。
+
+
+
+
+

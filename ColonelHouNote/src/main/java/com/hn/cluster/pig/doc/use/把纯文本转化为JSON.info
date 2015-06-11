@@ -1,0 +1,10 @@
+假设输入文件 a.txt 内容为：
+1 2
+9 8
+则如下Pig代码将把它转化为JSON格式：
+A = LOAD 'a.txt' AS (col1: chararray, col2: chararray);
+B = STORE A INTO 'result' USING JsonStorage();
+查看输出文件的内容是：
+{"col1":"1","col2":"2"}
+{"col1":"9","col2":"8"}
+可见，你LOAD输入数据时定义的字段名，就是输出文件中的JSON字段名。

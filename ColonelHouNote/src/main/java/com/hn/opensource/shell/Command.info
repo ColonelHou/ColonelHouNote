@@ -1,0 +1,85 @@
+##########VIM操作#############################
+:g/^$/d    删除空格
+：1,$s/old/new/g 全局替换
+变字母大小写:选择中字母: gU/u大/小写
+###########获取时间############################
+http://www.xuebuyuan.com/1122682.html
+获取明天的日期
+date -d next-day +%Y%m%d
+获取昨天的日期
+date -d last-day +%Y%m%d
+获取上个月的年和月
+date -d last-month +%Y%m
+获取下个月的年和月
+date -d next-month +%Y%m
+###########操作数据库##########################
+mysql -h192.168.1.13 -uroot -proot
+mysqldump -uroot -proot MyDB DB_TBL | gzip > /opt/hn/mysqlExport/DB_TBL.sql.gz
+查询mysql某一类表名称：
+查询以setup开头并且不包含setup_timers和setup_consumers的表名
+mysql -uroot -proot -e "select table_name from information_schema.TABLES where 
+table_schema='performance_schema'" | grep '^setup' | grep -v 'setup_timers\|setup_consumers' 
+| awk '{a=a?a" "$1:$1;b=b?b","$2:$2}END{print a,b}'   #多列转换为一行以空格为分隔符
+> /opt/hn/software/ExportMySQLDate/tbls.txt
+导入sql脚本:
+mysql>source mysql.sql; 
+###########$的用法############################
+$$
+Shell本身的PID（ProcessID）
+$!
+Shell最后运行的后台Process的PID
+$?
+最后运行的命令的结束代码（返回值）
+$-
+使用Set命令设定的Flag一览
+$*
+所有参数列表。如"$*"用「"」括起来的情况、以"$1 $2 … $n"的形式输出所有参数。
+$@
+所有参数列表。如"$@"用「"」括起来的情况、以"$1" "$2" … "$n" 的形式输出所有参数。
+$#
+添加到Shell的参数个数
+$0
+Shell本身的文件名
+$1～$n
+-ne —比较两个参数是否不相等
+-lt —参数1是否小于参数2
+-le —参数1是否小于等于参数2
+-gt —参数1是否大于参数2
+-ge —参数1是否大于等于参数2
+-f — 检查某文件是否存在（例如，if [ -f "filename" ]）
+-d — 检查目录是否存在
+##########
+查看文件有多少行内容
+wc -c filename
+#自动登录
+#!/usr/bin/expect -f
+set password hadoop
+#shell expect读取文件
+spawn ssh hadoop@hadoopSlave1
+expect "*password*"
+send "$password\n"
+interact
+##############################
+减压gz包gunzip xxxx.gz
+##############################
+1. 查看物理CPU的个数 
+#cat /proc/cpuinfo |grep "physical id"|sort |uniq|wc -l 
+2. 查看逻辑CPU的个数 
+#cat /proc/cpuinfo |grep "processor"|wc -l 
+3. 查看CPU是几核 
+#cat /proc/cpuinfo |grep "cores"|uniq 
+4. 查看CPU的主频 
+#cat /proc/cpuinfo |grep MHz|uniq 
+##############################
+sleep 1    睡眠1秒
+sleep 1s    睡眠1秒
+sleep 1m   睡眠1分
+sleep 1h   睡眠1小时
+#################################
+linux nofile默认值最大限制1024，ulimit -a
+修改[hadoop@hadoopSlave5Test /usr/local/flume/conf]$sudo vim /etc/security/limits.conf 
+*      soft    nofile  12580
+*              hard    nofile  65536
+查询某进程打开文件数
+[hadoop@hadoopSlave5Test /usr/local/flume/conf]$lsof -p 13130 | wc -l
+

@@ -1,0 +1,130 @@
+[hadoop@hadoop pig/scripts]$hdfs dfs -cat /pig/data/orderComp/orderCom.log
+15/01/09 12:48:55 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+a 1 2 3 4.2 9.8
+a 3 0 5 3.5 2.1
+b 7 9 9 - -
+a 7 9 9 2.6 6.2
+a 1 2 5 7.7 5.9
+a 1 2 3 1.4 0.2
+
+问题如下：怎样求出在第2、3、4列的所有组合的情况下，最后两列的平均值分别是多少？
+例如，第2、3、4列有一个组合为（1，2，3），即第一行和最后一行数据。对这个维度组合来说，最后两列的平均值分别为：
+（4.2+1.4）/2＝2.8
+（9.8+0.2）/2＝5.0
+
+[hadoop@hadoop pig/scripts]$cat orderCom.pig
+--①加载 a.txt 文件，并指定每一列的数据类型分别为 chararray（字符串），int，int，int，double，double。同时，我们还给予了每一列别名，分别为 col1，col2，……，col6。这个别名在后面的数据处理中会用到——如果你不指定别名，那么在后面的处理中，就只能使用索引（$0，$1，……）来标识相应的列了，这样可读性会变差，因此，在列固定的情况下，还是指定别名的好。
+将数据加载之后，保存到变量A中，
+A = LOAD '/pig/data/orderComp/orderCom.log' USING PigStorage(' ') AS (col1:chararray, col2:int, col3:int, col4:int, col5:double, col6:double);
+--CC = COUNT(*);
+CC = GROUP A ALL;
+--统计行数, 如果A.col6为空的就不计算; 
+--那是因为你LOAD数据的时候指定了col2的数据类型为int，而a.txt的第二行数据是空的，因此数据加载到A以后，有一个字段就是空的：
+DD = FOREACH CC GENERATE COUNT(A.col6);
+STORE DD INTO '/pig/data/orderComp/output/count/';
+--②按照A的第2、3、4列，对A进行分组。pig会找出所有第2、3、4列的组合，并按照升序进行排列，然后将它们与对应的包A整合起来
+--B: {group: (col2: int,col3: int,col4: int),A: {col1: chararray,col2: int,col3: int,col4: int,col5: double,col6: double}}
+--可见，A的第2、3、4列的组合被pig赋予了一个别名：group，这很形象。
+B = GROUP A BY (col2, col3, col4);
+--STORE B INTO '/pig/data/orderComp/output/group/' USING PigStorage(':');
+--③计算每一种组合下的最后两列的平均值。
+C = FOREACH B GENERATE group, AVG(A.col5), AVG(A.col6);
+--STORE C INTO '/pig/data/orderComp/output/last/' USING PigStorage(':');
+
+[hadoop@hadoop pig/scripts]$hdfs dfs -cat /pig/data/orderComp/output/count/part-r-00000
+15/01/09 12:48:07 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+5
+[hadoop@hadoop pig/scripts]$hdfs dfs -cat /pig/data/orderComp/output/part-r-00000
+15/01/09 12:49:07 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+((1,2,3),2.8,5.0)
+((1,2,5),7.7,5.9)
+((3,0,5),3.5,2.1)
+((7,9,9),2.6,6.2)
+
+FLATTEN操作符的作用:
+从字面上看，flatten就是“弄平”的意思，“解嵌套”
+((1,2,3),2.8,5.0)
+((1,2,5),7.7,5.9)
+((3,0,5),3.5,2.1)
+((7,9,9),2.6,6.2)
+C = FOREACH B GENERATE FLATTEN(group), AVG(A.col5), AVG(A.col6);
+变成：
+(1,2,3,2.8,5.0)
+(1,2,5,7.7,5.9)
+(3,0,5,3.5,2.1)
+(7,9,9,2.6,6.2)
+
+
+关于GROUP操作符：
+·用于GROUP的key如果多于一个字段（正如本文前面的例子），则GROUP之后的数据的key是一个元组（tuple），
+  否则它就是与用于GROUP的key相同类型的东西。
+·GROUP的结果是一个关系（relation），在这个关系中，每一组包含一个元组（tuple），这个元组包含两个字段：
+  （1）第一个字段被命名为“group”——这一点非常容易与GROUP关键字相混淆，但请区分开来。该字段的类型与用于GROUP的key类型相同。
+  （2）第二个字段是一个包（bag），它的类型与被GROUP的关系的类型相同。
+grunt> DESCRIBE A;
+A: {col1: chararray,col2: int,col3: int,col4: int,col5: double,col6: double}
+grunt> DESCRIBE B;
+B: {group: (col2: int,col3: int,col4: int),A: {(col1: chararray,col2: int,col3: int,col4: int,col5: double,col6: double)}}
+grunt> DESCRIBE C;
+C: {group: (col2: int,col3: int,col4: int),double,double}
+grunt> A = LOAD '/pig/data/orderComp/orderCom.log' USING PigStorage(' ') AS  (T : tuple(col1:chararray, col2:int, col3:int, col4:int, col5:double, col6:double));
+grunt> DESCRIBE A;
+A: {T: (col1: chararray,col2: int,col3: int,col4: int,col5: double,col6: double)}
+上面的方法将得到一个空的A：
+grunt> DUMP A;
+()
+()
+()
+()
+()
+()
+cat b.txt 
+(a,1,2,3,4.2,9.8)
+(a,3,0,5,3.5,2.1)
+(b,7,9,9,-,-)
+(a,7,9,9,2.6,6.2)
+(a,1,2,5,7.7,5.9)
+(a,1,2,3,1.4,0.2)
+grunt> A = LOAD 'b.txt' AS (T : tuple (col1:chararray, col2:int, col3:int, col4:int, col5:double, col6:double));
+grunt> DUMP A;
+((a,1,2,3,4.2,9.8))
+((a,3,0,5,3.5,2.1))
+((b,7,9,9,,))
+((a,7,9,9,2.6,6.2))
+((a,1,2,5,7.7,5.9))
+((a,1,2,3,1.4,0.2))
+
+
+求group by sum:
+[hadoop@hadoop pig/scripts]$cat c.txt 
+a 1 2 3 4.2 9.8 100
+a 3 0 5 3.5 2.1 200
+b 7 9 9 - - 300
+a 7 9 9 2.6 6.2 300
+a 1 2 5 7.7 5.9 200
+a 1 2 3 1.4 0.2 500
+[hadoop@hadoop pig/scripts]$vim groupSum.pig
+A = LOAD '/pig/data/groupSum/groupSum.log' USING PigStorage(' ') AS (col1:chararray, col2:int, col3:int, col4:int, col5:double, col6:double, col7:int);
+B = GROUP A BY (col2, col3, col4);
+((1,2,3),{(a,1,2,3,4.2,9.8,100),(a,1,2,3,1.4,0.2,500)})
+((1,2,5),{(a,1,2,5,7.7,5.9,200)})
+((3,0,5),{(a,3,0,5,3.5,2.1,200)})
+((7,9,9),{(b,7,9,9,,,300),(a,7,9,9,2.6,6.2,300)})
+--嵌套的FOREACH
+--DISTINCT：Removes duplicate tuples in a relation.
+--FOREACH 是对B的每一行进行遍历，其中，B的每一行里含有一个包（bag），每一个包中含有若干元组（tuple）A，
+--因此，FOREACH 后面的大括号里的操作，其实是对所谓的“内部包”（inner bag）的操作（详情请参看FOREACH的说明），
+--在这里，我们指定了对A的col7这一列进行去重，去重的结果被命名为D，然后再对D计数（COUNT），就得到了我们想要的结果。
+C = FOREACH B {D = DISTINCT A.col7; GENERATE group, COUNT(D);};
+STORE C INTO '/pig/data/groupSum/output/';
+[hadoop@hadoop pig/scripts]$hdfs dfs -cat /pig/data/groupSum/output/part-r-00000
+15/01/09 14:31:18 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+(1,2,3) 2
+(1,2,5) 1
+(3,0,5) 1
+(7,9,9) 1
+
+==================如何将关系（relation）转换为标量（scalar）=======================
+http://pig.apache.org/docs/r0.8.1/piglatin_ref2.html#Casting+Relations+to+Scalars
+http://www.blogjava.net/redhatlinux/archive/2014/06/04/414405.html
+http://pig.apache.org/docs/r0.12.1/basic.html

@@ -1,0 +1,4 @@
+log4j.appender.logfile.File=${catalina.home}/${logFile.Name}
+p.setProperty("catalina.home", "E:\\hn\\tmp\\log4j\\2222");
+p.setProperty("logFile.Name", "2222.log");
+PropertyConfigurator.configure(p);

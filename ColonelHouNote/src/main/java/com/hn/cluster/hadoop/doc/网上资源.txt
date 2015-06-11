@@ -1,0 +1,2 @@
+十分钟搭建自己的hadoop2/CDH4集群
+http://www.tuicool.com/articles/fY7jiiR

@@ -1,0 +1,5 @@
+org.apache.hadoop.hdfs.DFSConfigKeys
+配置了端口
+
+org.apache.hadoop.yarn.conf.YarnConfiguration
+配置了Yarn端口

@@ -1,0 +1,42 @@
+-----------------------------------------------
+sudo 不需要输入密码设置：
+hadoop  ALL=(root)NOPASSWD:ALL
+-----------------------------------------------
+下载源：
+Yum安装方式：
+Yum方式是CENTOS系统常用安装方式，Repository定义起黑夜的下载源。在/etc/yum.repos.d下创建一个定义下载路经的文件。
+·创建cloudera-manager.repo内容如下：
+[cloudera-manager]
+name=Cloudera manager
+baseurl=http://archive.cloudera.com/cm4/redhat/6/x86_64/cm/4.1.0/
+gpgkey=http://archive.cloudera.com/cm4/redhat/6/x86_64/cm/RPM-GPG-KEY-cloudera
+gpgcheck=1
+也就是下面这个文件中的所有内容：
+http://archive.cloudera.com/cm4/redhat/6/x86_64/cm/cloudera-manager.repo
+如果用的不是最新的版本
+baseurl=http://archive.cloudera.com/cm4/redhat/6/x86_64/cm/4/改为4.1.0
+问题 ：
+1.如果本地的下载源没效的话，ping www.baidu.com，如果是unknow host的话，需要设置GATEWAY=182.168.1.1
+DNS1=10.203.104.41
+NETMASK=255.255.255.0
+2.如果无法域名解析的话，进行如下操作：
+修改：vim /etc/resolv.conf
+nameserver 8.8.8.8
+nameserver 8.8.4.4
+这两个谷歌提供的
+-----------------------------------------------
+centos6x86_64 vm:
+http://virtual-machine.org/
+debian含tomcat vm：
+http://www.turnkeylinux.org/tomcat
+-----------------------------------------------
+centos启动是否进入图形界面：
+[hadoop@hadoopMaster ~]$vim /etc/inittab
+id:3:initdefault:
+#3是命令行， 5是图形界面
+----------------------------------------------
+ssh服务是否启动：
+/etc/init.d/sshd status
+chkconfig --list | grep sshd 查看是否添加启动中
+chkconfig --level 3 sshd on
+-----------------------------------------------

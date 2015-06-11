@@ -1,0 +1,31 @@
+去重，即去除重复的记录。通常，我们使用DISTINCT来去除整行重复的记录，但是，如果我们只想用几个字段来去重，怎么做？
+假设有以下数据文件：
+
+[root@localhost ~]$ cat 1.txt 
+1	2	3	4	uoip
+1	2	3	4	jklm
+9	7	5	3	sdfa
+8	8	8	8	dddd
+9	7	5	3	qqqq
+8	8	8	8	sfew
+我们要按第1、2、3、4个字段来去重，也就是说，去重结果应为：
+
+1	2	3	4	uoip
+9	7	5	3	sdfa
+8	8	8	8	dddd
+那么，我们可以这样做：
+
+A = LOAD '1.txt' AS (col1: chararray, col2: chararray, col3: chararray, col4: chararray, col5: chararray);
+B = GROUP A BY (col1, col2, col3, col4);
+C = FOREACH B {
+	D = LIMIT A 1;
+	GENERATE FLATTEN(D);
+};
+DUMP C;
+文章来源：http://www.codelast.com/
+输出结果为：
+
+(1,2,3,4,uoip)
+(8,8,8,8,dddd)
+(9,7,5,3,sdfa)
+代码很简单，就是利用了GROUP时会自动对group的key去重的功能，这里不用多解释大家应该也能看懂。

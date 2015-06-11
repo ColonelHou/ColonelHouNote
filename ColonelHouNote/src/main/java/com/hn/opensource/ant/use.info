@@ -1,0 +1,6 @@
+配置代理：
+win:
+set ANT_OPTS=-Dhttp.proxyHost=proxy.com -Dhttp.proxyPort=8080
+linux:
+set ANT_OPTS=-Dhttp.proxyHost=代理服务器地址 -Dhttp.proxyPort=代理服务器端口 -Dhttp.proxyUserName=用户名 -Dhttp.proxyPassword=密码  
+export ANT_OPTS

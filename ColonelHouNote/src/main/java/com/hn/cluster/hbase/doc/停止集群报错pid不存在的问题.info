@@ -1,0 +1,5 @@
+原因是，默认情况下pid文件保存在/tmp目录下，/tmp目录下的文件很容易丢失，解决办法：在hbase-env.sh中修改pid文件的存放路径
+# The directory where pid files are stored. /tmp by default.  
+ export HBASE_PID_DIR=/var/hadoop/pids  
+ 
+ hadoop也一样

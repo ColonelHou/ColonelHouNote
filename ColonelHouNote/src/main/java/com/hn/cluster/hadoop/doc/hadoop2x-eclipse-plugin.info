@@ -1,0 +1,125 @@
+下载：hadoop@hadoopSlave2:/opt/hn/eclipse_hadoop/master$ wget https://github.com/winghc/hadoop2x-eclipse-plugin/archive/master.zip
+解压：hadoop@hadoopSlave2:/opt/hn/eclipse_hadoop/master$ unzip master.zip 
+进入目录：
+hadoop@hadoopSlave2:/opt/hn/eclipse_hadoop/master$ cd hadoop2x-eclipse-plugin-master/src/contrib/eclipse-plugin/
+如果有代理， 需要给ant添加代理
+export ANT_OPTS="-Dhttp.proxyHost=proxy.com -Dhttp.proxyPort=8080 -Dhttps.proxyHost=proxy.com -Dhttps.proxyPort=8080"
+编译：
+hadoop@hadoopSlave2:/opt/hn/eclipse_hadoop/master/hadoop2x-eclipse-plugin-master/src/contrib/eclipse-plugin$ ant jar -Dversion=2.2.0 -Declipse.home=/opt/hn/developTools/eclipse -Dhadoop.home=/usr/local/hadoop
+Buildfile: /opt/hn/eclipse_hadoop/master/hadoop2x-eclipse-plugin-master/src/contrib/eclipse-plugin/build.xml
+
+check-contrib:
+
+init:
+     [echo] contrib: eclipse-plugin
+
+init-contrib:
+
+ivy-download:
+      [get] Getting: http://repo2.maven.org/maven2/org/apache/ivy/ivy/2.1.0/ivy-2.1.0.jar
+      [get] To: /opt/hn/eclipse_hadoop/master/hadoop2x-eclipse-plugin-master/ivy/ivy-2.1.0.jar
+      [get] Not modified - so not downloaded
+
+ivy-probe-antlib:
+
+ivy-init-antlib:
+
+ivy-init:
+[ivy:configure] :: Ivy 2.1.0 - 20090925235825 :: http://ant.apache.org/ivy/ ::
+[ivy:configure] :: loading settings :: file = /opt/hn/eclipse_hadoop/master/hadoop2x-eclipse-plugin-master/ivy/ivysettings.xml
+
+ivy-resolve-common:
+
+ivy-retrieve-common:
+[ivy:cachepath] DEPRECATED: 'ivy.conf.file' is deprecated, use 'ivy.settings.file' instead
+[ivy:cachepath] :: loading settings :: file = /opt/hn/eclipse_hadoop/master/hadoop2x-eclipse-plugin-master/ivy/ivysettings.xml
+
+compile:
+     [echo] contrib: eclipse-plugin
+    [javac] /opt/hn/eclipse_hadoop/master/hadoop2x-eclipse-plugin-master/src/contrib/eclipse-plugin/build.xml:76: warning: 'includeantruntime' was not set, defaulting to build.sysclasspath=last; set to false for repeatable builds
+    [javac] Compiling 45 source files to /opt/hn/eclipse_hadoop/master/hadoop2x-eclipse-plugin-master/build/contrib/eclipse-plugin/classes
+    [javac] /usr/local/hadoop/share/hadoop/common/hadoop-common-2.2.0.jar(org/apache/hadoop/fs/Path.class): 警告: 无法找到类型 'LimitedPrivate' 的注释方法 'value()': 找不到org.apache.hadoop.classification.InterfaceAudience的类文件
+    [javac] /usr/local/hadoop/share/hadoop/hdfs/hadoop-hdfs-2.2.0.jar(org/apache/hadoop/hdfs/DistributedFileSystem.class): 警告: 无法找到类型 'LimitedPrivate' 的注释方法 'value()'
+    [javac] /usr/local/hadoop/share/hadoop/common/hadoop-common-2.2.0.jar(org/apache/hadoop/fs/FileSystem.class): 警告: 无法找到类型 'LimitedPrivate' 的注释方法 'value()'
+    [javac] /usr/local/hadoop/share/hadoop/common/hadoop-common-2.2.0.jar(org/apache/hadoop/fs/FileSystem.class): 警告: 无法找到类型 'LimitedPrivate' 的注释方法 'value()'
+    [javac] /usr/local/hadoop/share/hadoop/common/hadoop-common-2.2.0.jar(org/apache/hadoop/fs/FileSystem.class): 警告: 无法找到类型 'LimitedPrivate' 的注释方法 'value()'
+    [javac] /usr/local/hadoop/share/hadoop/common/hadoop-common-2.2.0.jar(org/apache/hadoop/fs/FSDataInputStream.class): 警告: 无法找到类型 'LimitedPrivate' 的注释方法 'value()'
+    [javac] /usr/local/hadoop/share/hadoop/common/hadoop-common-2.2.0.jar(org/apache/hadoop/fs/FSDataOutputStream.class): 警告: 无法找到类型 'LimitedPrivate' 的注释方法 'value()'
+    [javac] 注: 某些输入文件使用或覆盖了已过时的 API。
+    [javac] 注: 有关详细信息, 请使用 -Xlint:deprecation 重新编译。
+    [javac] 注: 某些输入文件使用了未经检查或不安全的操作。
+    [javac] 注: 有关详细信息, 请使用 -Xlint:unchecked 重新编译。
+    [javac] 7 个警告
+
+jar:
+    [mkdir] Created dir: /opt/hn/eclipse_hadoop/master/hadoop2x-eclipse-plugin-master/build/contrib/eclipse-plugin/lib
+     [copy] Copying 9 files to /opt/hn/eclipse_hadoop/master/hadoop2x-eclipse-plugin-master/build/contrib/eclipse-plugin/lib
+     [copy] Copying /usr/local/hadoop/share/hadoop/mapreduce/hadoop-mapreduce-client-app-2.2.0.jar to /opt/hn/eclipse_hadoop/master/hadoop2x-eclipse-plugin-master/build/contrib/eclipse-plugin/lib/hadoop-mapreduce-client-app-2.2.0.jar
+     [copy] Copying /usr/local/hadoop/share/hadoop/mapreduce/hadoop-mapreduce-client-common-2.2.0.jar to /opt/hn/eclipse_hadoop/master/hadoop2x-eclipse-plugin-master/build/contrib/eclipse-plugin/lib/hadoop-mapreduce-client-common-2.2.0.jar
+     [copy] Copying /usr/local/hadoop/share/hadoop/mapreduce/hadoop-mapreduce-client-core-2.2.0.jar to /opt/hn/eclipse_hadoop/master/hadoop2x-eclipse-plugin-master/build/contrib/eclipse-plugin/lib/hadoop-mapreduce-client-core-2.2.0.jar
+     [copy] Copying /usr/local/hadoop/share/hadoop/mapreduce/hadoop-mapreduce-client-hs-2.2.0.jar to /opt/hn/eclipse_hadoop/master/hadoop2x-eclipse-plugin-master/build/contrib/eclipse-plugin/lib/hadoop-mapreduce-client-hs-2.2.0.jar
+     [copy] Copying /usr/local/hadoop/share/hadoop/mapreduce/hadoop-mapreduce-client-hs-plugins-2.2.0.jar to /opt/hn/eclipse_hadoop/master/hadoop2x-eclipse-plugin-master/build/contrib/eclipse-plugin/lib/hadoop-mapreduce-client-hs-plugins-2.2.0.jar
+     [copy] Copying /usr/local/hadoop/share/hadoop/mapreduce/hadoop-mapreduce-client-jobclient-2.2.0-tests.jar to /opt/hn/eclipse_hadoop/master/hadoop2x-eclipse-plugin-master/build/contrib/eclipse-plugin/lib/hadoop-mapreduce-client-jobclient-2.2.0-tests.jar
+     [copy] Copying /usr/local/hadoop/share/hadoop/mapreduce/hadoop-mapreduce-client-jobclient-2.2.0.jar to /opt/hn/eclipse_hadoop/master/hadoop2x-eclipse-plugin-master/build/contrib/eclipse-plugin/lib/hadoop-mapreduce-client-jobclient-2.2.0.jar
+     [copy] Copying /usr/local/hadoop/share/hadoop/mapreduce/hadoop-mapreduce-client-shuffle-2.2.0.jar to /opt/hn/eclipse_hadoop/master/hadoop2x-eclipse-plugin-master/build/contrib/eclipse-plugin/lib/hadoop-mapreduce-client-shuffle-2.2.0.jar
+     [copy] Copying /usr/local/hadoop/share/hadoop/mapreduce/hadoop-mapreduce-examples-2.2.0.jar to /opt/hn/eclipse_hadoop/master/hadoop2x-eclipse-plugin-master/build/contrib/eclipse-plugin/lib/hadoop-mapreduce-examples-2.2.0.jar
+     [copy] Copying 3 files to /opt/hn/eclipse_hadoop/master/hadoop2x-eclipse-plugin-master/build/contrib/eclipse-plugin/lib
+     [copy] Copying /usr/local/hadoop/share/hadoop/common/hadoop-common-2.2.0-tests.jar to /opt/hn/eclipse_hadoop/master/hadoop2x-eclipse-plugin-master/build/contrib/eclipse-plugin/lib/hadoop-common-2.2.0-tests.jar
+     [copy] Copying /usr/local/hadoop/share/hadoop/common/hadoop-common-2.2.0.jar to /opt/hn/eclipse_hadoop/master/hadoop2x-eclipse-plugin-master/build/contrib/eclipse-plugin/lib/hadoop-common-2.2.0.jar
+     [copy] Copying /usr/local/hadoop/share/hadoop/common/hadoop-nfs-2.2.0.jar to /opt/hn/eclipse_hadoop/master/hadoop2x-eclipse-plugin-master/build/contrib/eclipse-plugin/lib/hadoop-nfs-2.2.0.jar
+     [copy] Copying 3 files to /opt/hn/eclipse_hadoop/master/hadoop2x-eclipse-plugin-master/build/contrib/eclipse-plugin/lib
+     [copy] Copying /usr/local/hadoop/share/hadoop/hdfs/hadoop-hdfs-2.2.0-tests.jar to /opt/hn/eclipse_hadoop/master/hadoop2x-eclipse-plugin-master/build/contrib/eclipse-plugin/lib/hadoop-hdfs-2.2.0-tests.jar
+     [copy] Copying /usr/local/hadoop/share/hadoop/hdfs/hadoop-hdfs-2.2.0.jar to /opt/hn/eclipse_hadoop/master/hadoop2x-eclipse-plugin-master/build/contrib/eclipse-plugin/lib/hadoop-hdfs-2.2.0.jar
+     [copy] Copying /usr/local/hadoop/share/hadoop/hdfs/hadoop-hdfs-nfs-2.2.0.jar to /opt/hn/eclipse_hadoop/master/hadoop2x-eclipse-plugin-master/build/contrib/eclipse-plugin/lib/hadoop-hdfs-nfs-2.2.0.jar
+     [copy] Copying 11 files to /opt/hn/eclipse_hadoop/master/hadoop2x-eclipse-plugin-master/build/contrib/eclipse-plugin/lib
+     [copy] Copying /usr/local/hadoop/share/hadoop/yarn/hadoop-yarn-api-2.2.0.jar to /opt/hn/eclipse_hadoop/master/hadoop2x-eclipse-plugin-master/build/contrib/eclipse-plugin/lib/hadoop-yarn-api-2.2.0.jar
+     [copy] Copying /usr/local/hadoop/share/hadoop/yarn/hadoop-yarn-applications-distributedshell-2.2.0.jar to /opt/hn/eclipse_hadoop/master/hadoop2x-eclipse-plugin-master/build/contrib/eclipse-plugin/lib/hadoop-yarn-applications-distributedshell-2.2.0.jar
+     [copy] Copying /usr/local/hadoop/share/hadoop/yarn/hadoop-yarn-applications-unmanaged-am-launcher-2.2.0.jar to /opt/hn/eclipse_hadoop/master/hadoop2x-eclipse-plugin-master/build/contrib/eclipse-plugin/lib/hadoop-yarn-applications-unmanaged-am-launcher-2.2.0.jar
+     [copy] Copying /usr/local/hadoop/share/hadoop/yarn/hadoop-yarn-client-2.2.0.jar to /opt/hn/eclipse_hadoop/master/hadoop2x-eclipse-plugin-master/build/contrib/eclipse-plugin/lib/hadoop-yarn-client-2.2.0.jar
+     [copy] Copying /usr/local/hadoop/share/hadoop/yarn/hadoop-yarn-common-2.2.0.jar to /opt/hn/eclipse_hadoop/master/hadoop2x-eclipse-plugin-master/build/contrib/eclipse-plugin/lib/hadoop-yarn-common-2.2.0.jar
+     [copy] Copying /usr/local/hadoop/share/hadoop/yarn/hadoop-yarn-server-common-2.2.0.jar to /opt/hn/eclipse_hadoop/master/hadoop2x-eclipse-plugin-master/build/contrib/eclipse-plugin/lib/hadoop-yarn-server-common-2.2.0.jar
+     [copy] Copying /usr/local/hadoop/share/hadoop/yarn/hadoop-yarn-server-nodemanager-2.2.0.jar to /opt/hn/eclipse_hadoop/master/hadoop2x-eclipse-plugin-master/build/contrib/eclipse-plugin/lib/hadoop-yarn-server-nodemanager-2.2.0.jar
+     [copy] Copying /usr/local/hadoop/share/hadoop/yarn/hadoop-yarn-server-resourcemanager-2.2.0.jar to /opt/hn/eclipse_hadoop/master/hadoop2x-eclipse-plugin-master/build/contrib/eclipse-plugin/lib/hadoop-yarn-server-resourcemanager-2.2.0.jar
+     [copy] Copying /usr/local/hadoop/share/hadoop/yarn/hadoop-yarn-server-tests-2.2.0.jar to /opt/hn/eclipse_hadoop/master/hadoop2x-eclipse-plugin-master/build/contrib/eclipse-plugin/lib/hadoop-yarn-server-tests-2.2.0.jar
+     [copy] Copying /usr/local/hadoop/share/hadoop/yarn/hadoop-yarn-server-web-proxy-2.2.0.jar to /opt/hn/eclipse_hadoop/master/hadoop2x-eclipse-plugin-master/build/contrib/eclipse-plugin/lib/hadoop-yarn-server-web-proxy-2.2.0.jar
+     [copy] Copying /usr/local/hadoop/share/hadoop/yarn/hadoop-yarn-site-2.2.0.jar to /opt/hn/eclipse_hadoop/master/hadoop2x-eclipse-plugin-master/build/contrib/eclipse-plugin/lib/hadoop-yarn-site-2.2.0.jar
+     [copy] Copying 1 file to /opt/hn/eclipse_hadoop/master/hadoop2x-eclipse-plugin-master/build/contrib/eclipse-plugin/lib
+     [copy] Copying /usr/local/hadoop/share/hadoop/common/lib/protobuf-java-2.5.0.jar to /opt/hn/eclipse_hadoop/master/hadoop2x-eclipse-plugin-master/build/contrib/eclipse-plugin/lib/protobuf-java-2.5.0.jar
+     [copy] Copying 1 file to /opt/hn/eclipse_hadoop/master/hadoop2x-eclipse-plugin-master/build/contrib/eclipse-plugin/lib
+     [copy] Copying /usr/local/hadoop/share/hadoop/common/lib/log4j-1.2.17.jar to /opt/hn/eclipse_hadoop/master/hadoop2x-eclipse-plugin-master/build/contrib/eclipse-plugin/lib/log4j-1.2.17.jar
+     [copy] Copying 1 file to /opt/hn/eclipse_hadoop/master/hadoop2x-eclipse-plugin-master/build/contrib/eclipse-plugin/lib
+     [copy] Copying /usr/local/hadoop/share/hadoop/common/lib/commons-cli-1.2.jar to /opt/hn/eclipse_hadoop/master/hadoop2x-eclipse-plugin-master/build/contrib/eclipse-plugin/lib/commons-cli-1.2.jar
+     [copy] Copying 1 file to /opt/hn/eclipse_hadoop/master/hadoop2x-eclipse-plugin-master/build/contrib/eclipse-plugin/lib
+     [copy] Copying /usr/local/hadoop/share/hadoop/common/lib/commons-configuration-1.6.jar to /opt/hn/eclipse_hadoop/master/hadoop2x-eclipse-plugin-master/build/contrib/eclipse-plugin/lib/commons-configuration-1.6.jar
+     [copy] Copying 1 file to /opt/hn/eclipse_hadoop/master/hadoop2x-eclipse-plugin-master/build/contrib/eclipse-plugin/lib
+     [copy] Copying /usr/local/hadoop/share/hadoop/common/lib/commons-lang-2.5.jar to /opt/hn/eclipse_hadoop/master/hadoop2x-eclipse-plugin-master/build/contrib/eclipse-plugin/lib/commons-lang-2.5.jar
+     [copy] Copying 1 file to /opt/hn/eclipse_hadoop/master/hadoop2x-eclipse-plugin-master/build/contrib/eclipse-plugin/lib
+     [copy] Copying /usr/local/hadoop/share/hadoop/common/lib/jackson-core-asl-1.8.8.jar to /opt/hn/eclipse_hadoop/master/hadoop2x-eclipse-plugin-master/build/contrib/eclipse-plugin/lib/jackson-core-asl-1.8.8.jar
+     [copy] Copying 1 file to /opt/hn/eclipse_hadoop/master/hadoop2x-eclipse-plugin-master/build/contrib/eclipse-plugin/lib
+     [copy] Copying /usr/local/hadoop/share/hadoop/common/lib/jackson-mapper-asl-1.8.8.jar to /opt/hn/eclipse_hadoop/master/hadoop2x-eclipse-plugin-master/build/contrib/eclipse-plugin/lib/jackson-mapper-asl-1.8.8.jar
+     [copy] Copying 1 file to /opt/hn/eclipse_hadoop/master/hadoop2x-eclipse-plugin-master/build/contrib/eclipse-plugin/lib
+     [copy] Copying /usr/local/hadoop/share/hadoop/common/lib/slf4j-log4j12-1.7.5.jar to /opt/hn/eclipse_hadoop/master/hadoop2x-eclipse-plugin-master/build/contrib/eclipse-plugin/lib/slf4j-log4j12-1.7.5.jar
+     [copy] Copying 1 file to /opt/hn/eclipse_hadoop/master/hadoop2x-eclipse-plugin-master/build/contrib/eclipse-plugin/lib
+     [copy] Copying /usr/local/hadoop/share/hadoop/common/lib/slf4j-api-1.7.5.jar to /opt/hn/eclipse_hadoop/master/hadoop2x-eclipse-plugin-master/build/contrib/eclipse-plugin/lib/slf4j-api-1.7.5.jar
+     [copy] Copying 1 file to /opt/hn/eclipse_hadoop/master/hadoop2x-eclipse-plugin-master/build/contrib/eclipse-plugin/lib
+     [copy] Copying /usr/local/hadoop/share/hadoop/common/lib/guava-11.0.2.jar to /opt/hn/eclipse_hadoop/master/hadoop2x-eclipse-plugin-master/build/contrib/eclipse-plugin/lib/guava-11.0.2.jar
+     [copy] Copying 1 file to /opt/hn/eclipse_hadoop/master/hadoop2x-eclipse-plugin-master/build/contrib/eclipse-plugin/lib
+     [copy] Copying /usr/local/hadoop/share/hadoop/common/lib/hadoop-auth-2.2.0.jar to /opt/hn/eclipse_hadoop/master/hadoop2x-eclipse-plugin-master/build/contrib/eclipse-plugin/lib/hadoop-auth-2.2.0.jar
+     [copy] Copying 1 file to /opt/hn/eclipse_hadoop/master/hadoop2x-eclipse-plugin-master/build/contrib/eclipse-plugin/lib
+     [copy] Copying /usr/local/hadoop/share/hadoop/common/lib/netty-3.6.2.Final.jar to /opt/hn/eclipse_hadoop/master/hadoop2x-eclipse-plugin-master/build/contrib/eclipse-plugin/lib/netty-3.6.2.Final.jar
+      [jar] Building jar: /opt/hn/eclipse_hadoop/master/hadoop2x-eclipse-plugin-master/build/contrib/eclipse-plugin/hadoop-eclipse-plugin-2.2.0.jar
+
+BUILD SUCCESSFUL
+Total time: 18 seconds
+
+获取jar文件：
+hadoop@hadoopSlave2:/opt/hn/eclipse_hadoop/master/hadoop2x-eclipse-plugin-master/build/contrib/eclipse-plugin$ l
+总用量 23000
+drwxrwxr-x 7 hadoop hadoop     4096  6月  3 13:21 .
+drwxrwxr-x 3 hadoop hadoop     4096  6月  3 12:37 ..
+drwxrwxr-x 3 hadoop hadoop     4096  6月  3 13:21 classes
+drwxrwxr-x 2 hadoop hadoop     4096  6月  3 12:37 examples
+-rw-rw-r-- 1 hadoop hadoop 23523221  6月  3 13:21 hadoop-eclipse-plugin-2.2.0.jar
+drwxrwxr-x 2 hadoop hadoop     4096  6月  3 13:21 lib
+drwxrwxr-x 3 hadoop hadoop     4096  6月  3 12:37 system
+drwxrwxr-x 3 hadoop hadoop     4096  6月  3 12:37 test

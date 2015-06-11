@@ -1,0 +1,75 @@
+-----------------------------scala---------------------------------------------
+安装Scala：
+wget http://downloads.typesafe.com/scala/2.11.7/scala-2.11.7.tgz
+tar -xvf scala-2.11.7.tgz -C /usr/local/scala
+vim /etc/profile
+export SCALA_HOME=/usr/local/scala
+export PATH=$SCALA_HOME/bin:$PATH
+-------------------------------------------------------------------------------
+
+------------------------------spark--------------------------------------------
+wget http://archive.apache.org/dist/spark/spark-1.3.1/spark-1.3.1-bin-hadoop2.6.tgz
+tar -xvzf spark-1.3.1-bin-hadoop2.6.tgz -C /usr/local/spark
+vim /etc/profile
+export SPARK_HOME=/usr/local/spark
+export PATH=$PATH:$SPARK_HOME/bin
+cd /usr/local/spark/conf
+mv spark-env.sh.template spark-env.sh
+vim spark-env.sh
+JAVA_HOME=/usr/local/jdk
+export HADOOP_HOME=/usr/local/hadoop
+export HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop
+export SPARK_HOME=/usr/local/spark
+export SPARK_MASTER_IP=127.0.0.1
+export SPARK_MASTER_PORT=7077
+export SPARK_MASTER_WEBUI_PORT=8099
+
+export SPARK_WORKER_CORES=3 		#每个Worker使用的CPU核数
+export SPARK_WORKER_INSTANCES=1 	#每个Slave中启动几个Worker实例
+export SPARK_WORKER_MEMORY=10G 		#每个Worker使用多大的内存
+export SPARK_WORKER_WEBUI_PORT=8081 #Worker的WebUI端口号
+export SPARK_EXECUTOR_CORES=1 #每个Executor使用使用的核数
+export SPARK_EXECUTOR_MEMORY=1G #每个Executor使用的内存
+
+worker节点的主机名列表
+vim slaves
+mv log4j.properties.template log4j.properties
+在Master节点上执行
+cd /usr/local/spark && .bin/start-all.sh
+
+检查进程是否启动【在master节点上出现“Master”，在slave节点上出现“Worker”】
+
+监控页面URL
+http://master:8099/
+
+spark-shell
+[hadoop@traceMaster spark]$ ./bin/spark-shell --master spark://127.0.0.1:7077
+
+val count = sc.textFile(path).flatMap(line => line.split(",")).map(word => (word, 1)).reduceByKey(_+_)
+----------------------------spark on yarn--------------------------------------
+最好使用sbt编译spark yarn client,对Maven编译过的Spark进行SBT二次编译后，在运行部分例子的时候有错误发生。
+在Yarn上启动Spark
+1.提交Spark Job到Yarn中有二种部署模式，分别为yarn-cluster, yarn-client
+  yarn-cluster:集群中Yarn来管理Job，运行在application master进程中，客户端提交后可离开。
+  yarn-client: 运行在客户端进程中，Application Master中是从Yarn中请求资源。
+EG:./bin/spark-submit --class org.apache.spark.examples.SparkPi \
+    --master yarn-cluster \
+    --num-executors 3 \
+    --driver-memory 4g \
+    --executor-memory 2g \
+    --executor-cores 1 \
+    --queue thequeue \
+    lib/spark-examples*.jar \
+    10
+2.添加外部jar:
+   $ ./bin/spark-submit --class my.main.Class \
+    --master yarn-cluster \
+    --jars my-other-jar.jar,my-other-other-jar.jar
+    my-main-jar.jar
+    app_arg1 app_arg2
+3.查看Containers日志
+  a.启用yarn.log-aggregation-enable在yarn-site.xml中，container日志在本地删除并拷贝到HDFS,
+       通过以下命令可以查看日志：yarn logs -applicationId <app ID>
+  b.或者直接在HDFS目录下查看：
+    yarn.nodemanager.remote-app-log-dir and yarn.nodemanager.remote-app-log-dir-suffix配置中
+-------------------------------------------------------------------------------

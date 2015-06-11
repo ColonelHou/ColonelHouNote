@@ -1,0 +1,134 @@
+Hadoop自带了一个历史服务器，可以通过历史服务器查看已经运行完的Mapreduce作业记录，比如用了多少个Map、用了多少个Reduce、作业提交时间、作业启动时间、作业完成时间等信息。默认情况下，Hadoop历史服务器是没有启动的，我们可以通过下面的命令来启动Hadoop历史服务器
+
+$ sbin/mr-jobhistory-daemon.sh   start historyserver
+复制代码
+
+这样我们就可以在相应机器的19888端口上打开历史服务器的WEB UI界面。可以查看已经运行完的作业情况。历史服务器可以单独在一台机器上启动，主要是通过以下的参数配置：
+
+<property>
+    <name>mapreduce.jobhistory.address</name>
+    <value>0.0.0.0:10020</value>
+</property>
+
+<property>
+    <name>mapreduce.jobhistory.webapp.address</name>
+    <value>0.0.0.0:19888</value>
+</property>
+复制代码
+
+上面的参数是在mapred-site.xml文件中进行配置，mapreduce.jobhistory.address和mapreduce.jobhistory.webapp.address默认的值分别是0.0.0.0:10020和0.0.0.0:19888，大家可以根据自己的情况进行相应的配置，参数的格式是host:port。配置完上述的参数之后，重新启动Hadoop jobhistory，这样我们就可以在mapreduce.jobhistory.webapp.address参数配置的主机上对Hadoop历史作业情况经行查看。
+
+　　很多人就会问了，这些历史数据是存放在哪里的？是存放在HDFS中的，我们可以通过下面的配置来设置在HDFS的什么目录下存放历史作业记录：
+
+
+<property>
+    <name>mapreduce.jobhistory.done-dir</name>
+    <value>${yarn.app.mapreduce.am.staging-dir}/history/done</value>
+</property>
+
+<property>
+    <name>mapreduce.jobhistory.intermediate-done-dir</name>
+    <value>${yarn.app.mapreduce.am.staging-dir}
+                         /history/done_intermediate</value>
+</property>
+
+<property>
+    <name>yarn.app.mapreduce.am.staging-dir</name>
+    <value>/tmp/hadoop-yarn/staging</value>
+</property>
+复制代码
+
+上面的配置都默认的值，我们可以在mapred-site.xml文件中进行修改。其中，mapreduce.jobhistory.done-dir参数的意思是在什么目录下存放已经运行完的Hadoop作业记录；mapreduce.jobhistory.intermediate-done-dir的意思是正在运行的Hadoop作业记录。我们可以到mapreduce.jobhistory.done-dir参数配置的目录下看看里面存放的是什么东西：
+
+[wyp@master /home/wyp/hadoop]# bin/hadoop fs -ls /jobs/done/
+Found 2 items
+drwxrwx---   - wyp supergroup          0 2013-12-03 23:36 /jobs/done/2013
+drwxrwx---   - wyp supergroup          0 2014-02-01 00:02 /jobs/done/2014
+
+[wyp@master /home/wyp/hadoop]# bin/hadoop fs -ls /jobs/done/2014/02/16
+Found 27 items
+drwxrwx--- - wyp supergroup 0 2014-02-16 02:02 /jobs/done/2014/02/16/001216
+drwxrwx--- - wyp supergroup 0 2014-02-16 02:44 /jobs/done/2014/02/16/001217
+drwxrwx--- - wyp supergroup 0 2014-02-16 03:38 /jobs/done/2014/02/16/001218
+drwxrwx--- - wyp supergroup 0 2014-02-16 04:20 /jobs/done/2014/02/16/001219
+drwxrwx--- - wyp supergroup 0 2014-02-16 05:14 /jobs/done/2014/02/16/001220
+
+[wyp@master hadoop]# bin/hadoop fs -ls /jobs/done/2014/02/16/001216
+Found 1318 items
+-rwxrwx---   3 wyp    supergroup   45541335 2014-02-16 00:11 /jobs/done/2014
+/02/16/001216/job_1388830974669_1216161-1392478837250-wyp-insert+overwrite
++table+qt_city_query_ana...e%28Stage-1392480689141-5894-33-SUCCEEDED-wyp.jhist
+-rwxrwx---   3 wyp    supergroup     193572 2014-02-16 00:11 /jobs/done
+/2014/02/16/001216/job_1388830974669_1216161_conf.xml
+-rwxrwx---   3 wyp    supergroup   45594759 2014-02-16 00:11 /jobs/done/2014
+/02/16/001216/job_1388830974669_1216162-1392478837250-wyp-insert+overwrite
++table+qt_city_query_ana...e%28Stage-1392480694818-5894-33-SUCCEEDED-wyp.jhist
+-rwxrwx---   3 wyp    supergroup     193572 2014-02-16 00:11 /jobs/done
+/2014/02/16/001216/job_1388830974669_1216162_conf.xml
+复制代码
+
+　通过上面的结果我们可以得到一下几点：
+　　（1）、历史作业记录是存放在HDFS目录中；
+　　（2）、由于历史作业记录可能非常多，所以历史作业记录是按照年/月/日的形式分别存放在相应的目录中，这样便于管理和查找；
+　　（3）、对于每一个Hadoop历史作业记录相关信息都用两个文件存放，后缀名分别为*.jhist，*.xml。*.jhist文件里存放的是具体Hadoop作业的详细信息，如下：
+
+
+{
+　　"type": "JOB_INITED",
+　　"event": {
+    　　"org.apache.hadoop.mapreduce.jobhistory.JobInited": {
+      　　 "jobid": "job_1388830974669_1215999",
+       　　"launchTime": 1392477383583,
+      　　 "totalMaps": 1,
+       　　"totalReduces": 1,
+       　　"jobStatus": "INITED",
+       　　"uberized": false
+    　　}
+　　 }
+}
+复制代码
+这是Hadoop JOB初始化的一条信息，通过观察我们知道，*.jhist文件里面全部都是Json格式的数据。根据type进行区分这条Json的含义，在Hadoop中，总共包含了一下几个type：
+
+
+"JOB_SUBMITTED",
+"JOB_INITED",
+"JOB_FINISHED",
+"JOB_PRIORITY_CHANGED",
+"JOB_STATUS_CHANGED",
+"JOB_FAILED",
+"JOB_KILLED",
+"JOB_ERROR",
+"JOB_INFO_CHANGED",
+"TASK_STARTED",
+"TASK_FINISHED",
+"TASK_FAILED",
+"TASK_UPDATED",
+"NORMALIZED_RESOURCE",
+"MAP_ATTEMPT_STARTED",
+"MAP_ATTEMPT_FINISHED",
+"MAP_ATTEMPT_FAILED",
+"MAP_ATTEMPT_KILLED",
+"REDUCE_ATTEMPT_STARTED",
+"REDUCE_ATTEMPT_FINISHED",
+"REDUCE_ATTEMPT_FAILED",
+"REDUCE_ATTEMPT_KILLED",
+"SETUP_ATTEMPT_STARTED",
+"SETUP_ATTEMPT_FINISHED",
+"SETUP_ATTEMPT_FAILED",
+"SETUP_ATTEMPT_KILLED",
+"CLEANUP_ATTEMPT_STARTED",
+"CLEANUP_ATTEMPT_FINISHED",
+"CLEANUP_ATTEMPT_FAILED",
+"CLEANUP_ATTEMPT_KILLED",
+"AM_STARTED"
+复制代码
+而*.xml文件里面记录的是相应作业运行时候的完整参数配置，大家可以进去查看一下。
+
+　　（4）、每一个作业的历史记录都存放在一个单独的文件中。
+　　mapreduce.jobhistory.intermediate-done-dir配置的目录下主要存放的是当前正在运行的Hadoop任务的记录相关信息，感兴趣的同学可以进去看看，这里就不介绍了。
+　　如果对Hadoop历史服务器WEB UI上提供的数据不满意，我们就可以通过对mapreduce.jobhistory.done-dir配置的目录进行分析，得到我们感兴趣的信息，比如统计某天中运行了多少个map、运行最长的作业用了多少时间、每个用户运行的Mapreduce任务数、总共运行了多少Mapreduce数等信息，这样对监控Hadoop集群是很好的，我们可以根据那些信息来确定怎么给某个用户分配资源等等。
+　细心的同学可能发现，在Hadoop历史服务器的WEB UI上最多显示20000个历史的作业记录信息；其实我们可以通过下面的参数进行配置，然后重启一下Hadoop jobhistory即可。
+<property>
+    <name>mapreduce.jobhistory.joblist.cache.size</name>
+    <value>20000</value>
+</property>

@@ -1,0 +1,44 @@
+答案是不一定哦！我们还是看一个列子：
+//父类对象不能序列化
+class Employee{ 
+	private String name;
+	Employee(String n){
+		this.name=n;
+	}
+	public String getName(){
+		return this.name;
+	}
+}
+//子类对象可以序列化
+class Manager extends Employee implements Serializable{
+	private int id;
+	Manager(String name, int id){
+		super(name);
+		this.id=id;
+	}
+}
+//序列化与反序列化测试
+public static void main(String[] args) throws IOException, ClassNotFoundException{
+         File file=new File("E:/aaa.txt");
+	ObjectOutputStream oout=new ObjectOutputStream(new FileOutputStream(file));
+	oout.writeObject(new Manager("amao",123));
+	oout.close();
+	System.out.println("序列化成功");
+		
+	ObjectInputStream oin=new ObjectInputStream(new FileInputStream(file));
+	Object o=oin.readObject();
+	oin.close();
+	System.out.println("反序列化成功:"+((Manager) o).getName());
+}
+程序的运行结果是：打印出“序列化成功”之后抛出java.io.InvalidClassException: Manager;
+              Manager; no valid constructor。 为什么会出现这种情况呢？
+              
+              很显然，序列化的时候只是将Manager类对象的数据域id写入了文件，但在反序列化的过程中，
+              需要在堆中建立一个Manager新对象。我们都知道任何一个类对象的建立都首先需要调用父类的构造器对父类
+              进行初始化，很可惜序列化文件中并没有父类Employee的name数据，那么此时调用Employee(String)构
+              造器会因为没有数据而出现异常。既然没有数据，那么可不可以调用无参构造器呢？ 事实却是如此，
+              如果有Employee()无参构造器的存在，将不会抛出异常，
+              只是在执行打印的时候出现--- “反序列化成功：null”。
+       总结一下：
+如果当前类的所有超类中有一个类即不能序列化，也没有无参构造器。那么当前类将不能反序列化。
+如果有无参构造器，那么此超类反序列化的数据域将会是null或者0，false等等。 

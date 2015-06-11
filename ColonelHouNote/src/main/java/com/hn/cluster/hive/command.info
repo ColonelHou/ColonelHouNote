@@ -1,0 +1,15 @@
+查看根目录
+hive (testdb)> dfs -ls -R /;
+
+TRUNCATE TABLE table_name;
+
+#HQL  
+hive<<EOF  
+LOAD DATA LOCAL INPATH '$HADOOP_DATA_HOME/consume-$YESTODAY.csv' OVERWRITE INTO TABLE tlbb.consume_log PARTITION (dt='$YESTODAY');  
+EOF  
+echo "LOAD DATA LOCAL INPATH '/data/tlbb/hadoop_data/billlogout-$YESTODAY.csv' OVERWRITE INTO TABLE tlbb.logout_log PARTITION (dt='$YESTODAY');" | hive   
+
+
+script=`cat query.hql`
+echo $script
+hive -e "$script"

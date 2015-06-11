@@ -1,0 +1,3 @@
+[hadoop@hadoopMaster ~]$hbase org.apache.hadoop.hbase.io.hfile.HFile -f /hbase/data/default/hivehbaseStu/b78bed2cf19f6584c942c82c9c5daa6d/stu/f9d111e2f685446eae44bde1562dfc4b -p  
+K: row1/stu:course/1420509822704/Put/vlen=7/mvcc=0 V: english  
+K: row1/stu:dt/1420509822910/Put/vlen=6/mvcc=0 V: 201412  

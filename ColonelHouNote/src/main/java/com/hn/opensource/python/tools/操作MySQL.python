@@ -1,0 +1,33 @@
+#/usr/bin/env python
+#-*- coding: utf-8 -*-
+#install model https://pypi.python.org/packages/2.7/M/MySQL-python/MySQL-python-1.2.5.win32-py2.7.exe#md5=6f43f42516ea26e79cfb100af69a925e
+import MySQLdb
+def python_mysql_test():
+    """
+    try to use mysql in python
+    """
+
+    try:
+        conn=MySQLdb.connect(host='10.2.48.125',user='root',passwd='root',db='sampledb',port=3306)
+        print "conn=",conn;
+        cur=conn.cursor()
+        print "cur=",cur;
+        #conn.select_db  Select DB
+
+        #execute create insert update
+        #createdTable = cur.execute('create table test(id int,info varchar(20))')
+        #print "createdTable=",createdTable;
+        
+        #Query
+        cur.execute('select * from t_login_log')
+        data = cur.fetchall()
+        print data
+        
+        cur.close()
+        conn.close()
+    except MySQLdb.Error,e:
+         print "Mysql Error %d: %s" % (e.args[0], e.args[1])
+
+###############################################################################
+if __name__=="__main__":
+    python_mysql_test();

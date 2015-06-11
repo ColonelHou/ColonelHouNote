@@ -1,0 +1,76 @@
+=========================================================
+函数分类=内置函数(简单函数[map阶段]+聚合函数[reduce阶段]+集合函数[map阶段]) + 自定义函数(UDF[map阶段] + UDAF[reduce阶段])
+内置函数
+正则表达式
+自定义函数
+
+show functions;
+desc function concat;
+desc function extended concat;
+RLIKE:后跟正则表达式
+if(condition, a, b) if(a = b, 100, 200)
+coalesce返回参数中第一个非空值,
+======================窗口函数：
+应用场景
+ 用于分区排序
+ 动态group by
+ Top N
+ 累计计算
+ 层次查询
+ 
+======================分析函数
+======================分析函数
+======================UDTF
+hive> select get_json_object('{"name":"jim", "age":"20"}', '$.name');
+jim
+===========================自定义函数UDF====================
+针对每条记录处理
+import org.apache.hadoop.hive.ql.exec.UDF;
+import org.apache.hadoop.io.Text;
+
+public class UTFTest extends UDF {
+
+	public boolean evaluate(Text t1, Text t2){
+		if(t1 == null || t2 == null)
+		{
+			return false;
+		}
+		
+		double d1 = Double.parseDouble(t1.toString());
+		double d2 = Double.parseDouble(t2.toString());
+		
+		if(d1 >d2){
+			return true;
+		}else{
+			return false;
+		}
+	}
+}
+hive> add jar /opt/trace/tmp/myudf.jar;
+Added /opt/trace/tmp/myudf.jar to class path
+Added resource: /opt/trace/tmp/myudf.jar
+hive> desc mm;
+OK
+col                     string
+col2                    string
+Time taken: 0.253 seconds, Fetched: 2 row(s)
+hive> select col, col2, bigthan(col2, 3) from mm;
+============================UDAF函数===========================
+用户自定义聚合函数
+开发步骤：
+  1.编写resolver类，负责类型检查，操作符重载
+    继承org.apache.hadoop.hive.ql.udf.GenericUDAFResolver2
+	更建议继承AbstractGenericUDAFResolver
+  2.编写evaluator类，真正实现UDAF的逻辑
+    GenericUDAFEvaluator
+ 通常顶层UDAF类继承：
+ org.apache.hadoop.hive.ql.udf.GenericUDAFResolver2
+ 
+=====================永久函数=============================
+如果希望在hive中自定义一个函数，且永久使用，则修改源码添加受益人函数类，然后在修改
+ql/src/java/org/apache/hadoop/hive/ql/exec/Function/Registry.java类，添加受益人注册函数代码，regiesterUDF("parse_url", UDFParseUrl.class,false);
+hql文件，hive -i 'file'
+新建hiverc文件
+  jar包放到安装目录下或者指定目录下
+  $HOME/.hiverc
+  把初始化语句加载到文件中

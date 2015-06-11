@@ -1,0 +1,7 @@
+解决方案：
+
+1.修改nfile配置文件，手工增加nofile的大小
+vim /etc/security/limits.conf
+*               soft    nofile  12580
+*               hard    nofile  65535
+2.重启hadoop/hbase/flume进程，也就是进程3920，问题解决

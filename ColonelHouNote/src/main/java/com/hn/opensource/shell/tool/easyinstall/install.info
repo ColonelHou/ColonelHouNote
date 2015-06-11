@@ -1,0 +1,14 @@
+1. 下载:
+在它的官网可以下载到安装包:
+https://pypi.python.org/pypi/setuptools
+
+页面最下面的是它的安装链接,如:
+$wget --no-check-certificate https://pypi.python.org/packages/source/s/setuptools/setuptools-12.0.3.tar.gz#md5=f07e4b0f4c1c9368fcd980d888b29a65 
+
+2. 安装
+$ tar -zxvf setuptools-12.0.3.tar.gz
+$ cd setuptools=12.0.3
+$ python setup.py install
+
+
+easy_install web.py

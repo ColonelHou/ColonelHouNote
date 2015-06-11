@@ -1,0 +1,8 @@
+显示块信息:
+[hadoop@hadoopMaster ~]$hdfs fsck / -files -blocks
+查看HDFS命令行帮助信息:
+[hadoop@hadoopMaster ~]$hdfs dfs -help
+hdfs dfs -copyFromLocal localurl   hdfsurl
+hdfs dfs -mkdir /创建文件目录
+查看所有目录及文件
+hdfs dfs -ls -R /

@@ -1,0 +1,19 @@
+Shuffle描述着数据从map task输出到reduce task输入的这段过程
+m/r的task执行是在不同的节点上, 很我情况下R执行时需要跨节点去拉取其它结点上的M task结果;
+因为Shuffle阶段Reducer不运行
+Java API里的Collections.shuffle(List)方法，它会随机地打乱参数list里的元素顺序。
+
+
+
+
+
+
+
+
+
+
+
+
+http://www.360doc.com/content/14/0107/20/15109633_343416433.shtml
+http://langyu.iteye.com/blog/992916
+http://www.alidata.org/archives/1470

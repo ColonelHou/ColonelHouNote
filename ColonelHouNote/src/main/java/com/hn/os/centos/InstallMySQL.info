@@ -1,0 +1,145 @@
+[hadoop@hadoopMaster ~]$ sudo yum install ncurses-devel
+[hadoop@hadoopMaster ~]$ sudo yum install bison
+安装cmakehttp://www.cmake.org/files/v2.8/cmake-2.8.10.2.tar.gz
+http://mysql.mirror.kangaroot.net/Downloads/MySQL-5.5/mysql-5.5.39.tar.gz
+创建mysql的安装目录及数据库存放目录
+[hadoop@hadoopMaster ~]$ mkdir -p /usr/local/mysql //安装mysql
+[hadoop@hadoopMaster ~]$ mkdir -p /usr/local/mysql/data //存放数据库
+6.创建mysql用户及用户组
+[hadoop@hadoopMaster ~]$ groupadd mysql
+[hadoop@hadoopMaster ~]$ useradd -r -g mysql mysql
+
+7.编译安装mysql
+[hadoop@hadoopMaster ~]$ tar zxvf mysql-5.5.39.tar.gz //解压
+[hadoop@hadoopMaster ~]$ cd mysql-5.5.29
+[hadoop@hadoopMaster ~]$ 
+cmake -DCMAKE_INSTALL_PREFIX=/usr/local/mysql \
+-DMYSQL_UNIX_ADDR=/usr/local/mysql/mysql.sock \
+-DDEFAULT_CHARSET=utf8 \
+-DDEFAULT_COLLATION=utf8_general_ci \
+-DWITH_MYISAM_STORAGE_ENGINE=1 \
+-DWITH_INNOBASE_STORAGE_ENGINE=1 \
+-DWITH_MEMORY_STORAGE_ENGINE=1 \
+-DWITH_READLINE=1 \
+-DENABLED_LOCAL_INFILE=1 \
+-DMYSQL_DATADIR=/usr/local/mysql/data \
+-DMYSQL_USER=mysql \
+-DMYSQL_TCP_PORT=3306
+[hadoop@hadoopMaster ~]$ sudo make
+[hadoop@hadoopMaster ~]$ sudo make install
+---------------------------------------------------------------------------------
+.检验是否安装成功
+[hadoop@hadoopMaster ~]$ cd  /usr/local/mysql
+[hadoop@hadoopMaster ~]$ ls
+bin      data  include         lib  mysql-test  scripts  sql-bench
+COPYING  docs  INSTALL-BINARY  man  README      share    support-files
+有bin等以上文件的话，恭喜你已经成功安装了mysql。
+配置mysql
+9.设置mysql目录权限
+[hadoop@hadoopMaster ~]$ cd /usr/local/mysql //把当前目录中所有文件的所有者设为root，所属组为mysql
+[hadoop@hadoopMaster ~]$ chown -R root:mysql .
+[hadoop@hadoopMaster ~]$ chown -R mysql:mysql data
+10.将mysql的启动服务添加到系统服务中
+[hadoop@hadoopMaster ~]$ cp support-files/my-medium.cnf /etc/my.cnf
+cp：是否覆盖"/etc/my.cnf"？ y
+11.创建系统数据库的表
+[hadoop@hadoopMaster ~]$ cd /usr/local/mysql
+[hadoop@hadoopMaster ~]$ scripts/mysql_install_db --user=mysql
+12.设置环境变量
+[hadoop@hadoopMaster ~]$ vim /root/.bash_profile
+在修改PATH=$PATH:$HOME/bin为：
+PATH=$PATH:$HOME/bin:/usr/local/mysql/bin:/usr/local/mysql/lib
+[hadoop@hadoopMaster ~]$ source /root/.bash_profile //使刚才的修改生效
+13.手动启动mysql
+[hadoop@hadoopMaster ~]$ ./bin/mysqld_safe --user=mysql & //启动MySQL，但不能停止
+mysqladmin -u root -p shutdown //此时root还没密码，所以为空值，提示输入密码时，直接回车即可。
+14.将mysql的启动服务添加到系统服务中
+[hadoop@hadoopMaster ~]$ cp support-files/mysql.server /etc/init.d/mysql
+15.启动mysql
+[hadoop@hadoopMaster ~]$ service mysql start
+Starting MySQL... ERROR! The server quit without updating PID file (/usr/local/mysql/data/localhost.localdomain.pid).
+启动失败：
+我这里是权限问题，先改变权限
+[hadoop@hadoopMaster ~]$ chown -R mysql:mysql /usr/local/mysql
+接着启动服务器
+[hadoop@hadoopMaster ~]$ /etc/init.d/mysql start
+16.修改MySQL的root用户的密码以及打开远程连接
+[hadoop@hadoopMaster ~]$ mysql -u root mysql
+mysql> use mysql;
+mysql> desc user;
+mysql> GRANT ALL PRIVILEGES ON *.* TO root@"%" IDENTIFIED BY "root"; //为root添加远程连接的能力
+mysql> update user set Password = password('abc123') where User='root'; //设置root用户密码
+mysql> select Host,User,Password from user where User='root';
+mysql> flush privileges;
+mysql> exit
+17.重新登录
+[hadoop@hadoopMaster ~]$ mysql -u root -p
+Enter password:root
+若还不能进行远程连接，关闭防火墙
+[hadoop@hadoopMaster ~]$ /etc/rc.d/init.d/iptables stop
+ 
+==================18.配置Innodb
+[hadoop@hadoopMaster ~]$ cd /etc
+[hadoop@hadoopMaster ~]$ vi my.cnf
+# To take best advantage of current InnoDB features
+innodb_file_per_table=1
+innodb_file_format=barracuda
+innodb_strict_mode=1
+//官方推荐
+
+19.数据库的关闭
+[hadoop@hadoopMaster ~]$ /usr/local/mysql/support-files/mysql.server stop
+Shutting down MySQL. SUCCESS! 
+
+
+启动Mysql时报错：
+140907 14:04:09 mysqld_safe Logging to '/usr/local/mysql/data/fiona.err'.
+140907 14:04:09 mysqld_safe Starting mysqld daemon with databases from /usr/local/mysql/data
+140907 14:04:11 mysqld_safe mysqld from pid file /usr/local/mysql/data/fiona.pid ended
+由于登陆使用了如下命令：
+shell> ./bin/mysqld_safe --user=root &
+导致再次登陆时候使用
+shell> ./bin/mysqld_safe --user=mysql &
+解决方法：初始化mysql
+/usr/local/mysql/scripts/mysql_install_db --user=mysql
+
+1、#service mysqld start
+       提示：mysqld未被识别的服务
+       原因：没有安装mysql-server
+       解决方法：安装mysql-server
+               yum安装:#yum -y install mysql-server
+       安装mysql所需rpm软件包：
+                 mysql-5.1.61-1.el6_2.1.i686.rpm
+                 mysql-server-5.1.61-1.el6_2.1.i686.rpm
+                 mysql-libs-5.1.61-1.el6_2.1.i686.rpm
+
+2、#mysql -u root -p passwd
+     提示：ERROR 2002 (HY000)：Can't connect to local MySQL server through socket '/var/lib/mysql/mysql.sock' (2)
+     原因：没有开启mysqld服务
+     解决方案：切换到root，启用mysqld服务
+                命令：#service mysqld start
+
+3、查看mysql安装路径
+     命令：#whereis mysql
+
+4、查看mysqld服务是否已添加到linux
+     命令：#chkconfig --list mysqld
+     已添加提示：mysql           0：关闭   1：关闭   2：关闭   3：关闭   4：关闭    5：启用   6：关闭
+
+5、mysqld服务启用时，查看服务器是否在运行
+     命令：ps -el | grep mysqld
+
+Reference:
+http://dev.mysql.com/doc/refman/5.5/en/binary-installation.html
+http://www.cnblogs.com/zhoulf/archive/2013/01/25/zhoulf.html
+mysql启动的四种方式（推荐mysql_safe）
+http://blog.chinaunix.net/uid-13642598-id-3153537.html
+mysql DBA：mysqladmin常用命令总结
+http://www.jb51.net/article/48169.htm#
+http://www.linuxidc.com/Linux/2011-03/33362.htm
+
+mysql之编译安装mysql以及mysql mysqladmin工具的使用说明
+http://www.it165.net/database/html/201404/5890.html
+
+
+http://www.cnblogs.com/zhoulf/archive/2013/01/25/zhoulf.html

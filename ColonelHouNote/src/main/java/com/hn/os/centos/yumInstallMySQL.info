@@ -1,0 +1,14 @@
+第1步、yum安装mysql
+[hadoop@hadoopSlave1 ~]$ yum -y install mysql-server
+第2步、设置开机启动
+[hadoop@hadoopSlave1 ~]$ sudo chkconfig mysqld on
+第3步、启动MySql服务
+[hadoop@hadoopSlave1 ~]$ service mysqld start
+
+第4步、设置MySQL的root用户设置密码
+[hadoop@hadoopSlave1 ~]$ select user,host,password from mysql.user;
+查询用户的密码，都为空，用下面的命令设置root的密码为root
+mysql> set password for root@localhost=password('root');
+mysql> exit
+第5步、用新密码登陆
+[hadoop@hadoopSlave1 ~]$ mysql -u root -p

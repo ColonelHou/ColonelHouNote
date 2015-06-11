@@ -1,0 +1,15 @@
+Collection
+　　├List
+　　│├LinkedList链      快速插入，删除元素
+　　│├CopyOnWriteArrayList 可以迭代中删除增加元素
+　　│├ArrayList 有序    性能较好  随机访问好
+　　│└Vector    有序   同步  性能不好
+　　│　└Stack   有序   同步  性能不好
+　　├Queue  可以由linkedList指向它
+　　└Set         无序   
+　　│
+　　└
+　　Map
+　　├Hashtable          同步
+　　├HashMap            
+　　└WeakHashMap   key实行“弱引用”,如果一个key不再被外部引用,此key可以被GC

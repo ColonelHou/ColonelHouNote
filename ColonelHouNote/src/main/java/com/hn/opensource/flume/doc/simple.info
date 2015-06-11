@@ -1,0 +1,105 @@
+#设置配置文件
+
+[root@cc-staging-loginmgr2 conf]# cat example.conf
+
+# example.conf: A single-node Flume configuration
+
+ 
+
+# Name the components on this agent
+
+a1.sources = r1
+
+a1.sinks = k1
+
+a1.channels = c1
+
+ 
+
+# Describe/configure the source
+
+a1.sources.r1.type = netcat
+
+a1.sources.r1.bind = localhost
+
+a1.sources.r1.port = 44444
+
+ 
+
+# Describe the sink
+
+a1.sinks.k1.type = logger
+
+ 
+
+# Use a channel which buffers events in memory
+
+a1.channels.c1.type = memory
+
+a1.channels.c1.capacity = 1000
+
+a1.channels.c1.transactionCapacity = 100
+
+ 
+
+# Bind the source and sink to the channel
+
+a1.sources.r1.channels = c1
+
+a1.sinks.k1.channel = c1
+
+ 
+
+#命令参数说明
+
+-c conf 指定配置目录为conf
+
+-f conf/example.conf 指定配置文件为conf/example.conf
+
+-n a1 指定agent名字为a1,需要与example.conf中的一致
+
+-Dflume.root.logger=INFO,console 指定DEBUF模式在console输出INFO信息
+
+ 
+
+#启动agent
+
+cd /usr/local/apache-flume-1.3.1-bin
+
+flume-ng agent -c conf -f conf/example.conf -n a1 -Dflume.root.logger=INFO,console
+
+ 
+
+2013-05-24 00:00:09,288 (lifecycleSupervisor-1-0) [INFO - org.apache.flume.source.NetcatSource.start(NetcatSource.java:150)] Source starting
+
+2013-05-24 00:00:09,303 (lifecycleSupervisor-1-0) [INFO - org.apache.flume.source.NetcatSource.start(NetcatSource.java:164)] Created serverSocket:sun.nio.ch.ServerSocketChannelImpl[/127.0.0.1:44444]
+
+ 
+
+#在另一个终端进行测试
+
+[root@cc-staging-loginmgr2 conf]# telnet 127.0.0.1 44444
+
+Trying 127.0.0.1...
+
+Connected to localhost.localdomain (127.0.0.1).
+
+Escape character is '^]'.
+
+hello world!
+
+OK
+
+ 
+
+#在启动的终端查看console输出
+
+2013-05-24 00:00:24,306 (SinkRunner-PollingRunner-DefaultSinkProcessor) [INFO - org.apache.flume.sink.LoggerSink.process(LoggerSink.java:70)] Event: { headers:{} body: 68 65 6C 6C 6F 20 77 6F 72 6C 64 21 0D hello world!. }
+
+ 
+
+#测试成功，flume可以正常使用
+
+
+
+http://www.linuxidc.com/Linux/2013-06/86598p2.htm

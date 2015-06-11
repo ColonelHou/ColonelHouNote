@@ -1,0 +1,63 @@
+其实NameNode在挑选合适的DataNode去存储Block的时候，不仅仅考虑了DataNode的存储空间够不够，
+还会考虑这些DataNode在不在同一个机架上。这就需要NameNode必须知道所有的DataNode分别位于哪个机架上
+(所以也称为机架感知)。
+
+当然，默认情况下NameNode是不会知道机架的存在的，也就是说，默认情况下，NameNode会认为所有的DataNode
+都在同一个机架上(/defaultRack)。除非我们在hdfs-site.xml里面配置topology.script.file.name选项，
+这个选项的值是一个可执行文件的位置，而该只执行文件的作用是将输入的DataNode的ip地址按照一定规则计算，
+然后输出它所在的机架的名字，如/rack1, /rack2之类。借助这个文件，NameNode就具备了机架感知了。
+当它在挑选DataNode去存储Block的时候，它会遵循以下原则：
+
+
+首先：挑选跟HDFS Client所在的DataNode作为存放第一个Block副本的位置，如果HDFS Client不在任何一个DataNode上，
+          比如说Hadoop集群外你自己的电脑，那么就任意选取一个DataNode。
+其次：会借助NameNode的机架感知特性，选取跟第一个Block副本所在DataNode不同的机架上的任意一个
+     DataNode来存放Block的第二个副本，比如说/rack2。Block的第三个副本也会存在这个/rack2上，
+          但是是另外一个DataNode
+最后：如果我们设置的副本的数量大于3，那么剩下的副本则随意存储在集群中。
+
+
+
+
+hadoop中声明是有机架感知的功能，能够提高hadoop的性能。平时我们使用的hadoop集群，实际上是从来没有使用上这个功能的。 hadoop中所说的机架感知的实现实际上这样的：
+
+hadoop启动时会检查hadoop-default.xml和hadoop-site.xml中的一个配置选 项：topology.script.file.name，如果这个选项不为空，hadoop就会认为这是一个可运行脚本，于是在每检测到一个slave 连接上jobtracker时就会把这个slave的IP地址作为参数传给这个脚本，然后期待这个脚本的返回值返回这台slave所述的rack名。而这 个脚本内部具体是如何决定slave和rack的映射hadoop是不关心的。所以，哪台机器属于那个rack，其实是由写这个脚本的人决定。
+另外，和topology.script.file.name相对应的还有另外一个配置选 项：topology.script.number.args，这个选项的设定了以上脚本所能接受的最大参数个数，因为脚本被调用时会接受到不止一个参 数，每个参数都是一台机器的IP地址。
+实现步骤
+1, 在jobtracker的hadoop-site.xml配置文件中加入一下配置选项：
+<property>
+
+    <name>topology.script.file.name</name>
+
+    <value>/path/to/rackmap.sh</value>
+
+    <description> The script name that should be invoked to resolve DNS names to
+
+    NetworkTopology names. Example: the script would take host.foo.bar as an
+
+    argument, and return /rack1 as the output.
+
+    </description>
+
+  </property>
+
+
+
+  <property>
+
+    <name>topology.script.number.args</name>
+
+    <value>1000</value>
+
+    <description> The max number of args that the script configured with
+
+    topology.script.file.name should be run with. Each arg is an
+
+    IP address.
+
+    </description>
+
+  </property>
+
+编写rackmap.sh脚本，为每一个地址输出其所属的rack
+重启jobtracker

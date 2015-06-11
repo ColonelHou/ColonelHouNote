@@ -1,0 +1,5 @@
+maven报：
+Plugin execution not covered by lifecycle configuration: org.apache.avro:avro-maven-plugin:1.7.7:idl
+解决：https://www.eclipse.org/m2e/documentation/m2e-execution-not-covered.html
+ </build>内加</pluginManagement>
+

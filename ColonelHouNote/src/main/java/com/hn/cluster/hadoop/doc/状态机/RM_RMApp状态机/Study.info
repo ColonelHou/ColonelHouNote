@@ -1,0 +1,4 @@
+ResourceManager内部最复杂也是最重要的状态机——RMApp的状态机：
+
+作用：RMApp内部维护所有Application的状态，每个Application都有个RMApp对象(RMAppImpl)与之对应,
+          维护着对象基本信息，包括起始时间，名字，用户，组等信息，最复杂的部分莫过于其维护的状态机。

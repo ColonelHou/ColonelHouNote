@@ -1,0 +1,35 @@
+http://piwik.org/docs/optimize-how-to/
+
+
+If you have thousands of page views per day or more, check out the guide below to make sure Piwik works for you.
+Table of contents
+Configure Piwik for speed
+Configure your server for speed
+Configure your database server for speed
+Resources
+Configure Piwik for speed
+
+By default, Piwik works in real time. But when tracking a large website, It is highly recommended to disable “real time” reports and only process reports for “today” every 1 or 6 hours for example. This way, access to the user interface will only read pre-processed reports.
+Note: the Real Time Visitors widget and the Visitors Log will still work in real time, only other reports for “today” (Best keywords, etc.) would not include the latest visits and page views. See also How long does Reports pre-processing take for high traffic websites?
+Update Piwik to the latest version – How to for high traffic Piwik servers. Sometimes, new Piwik releases contain SQL schema updates on very big mysql tables (when adding a new field, new indexes, etc.). The schema updates can take minutes or hours to complete: it helps to run the Piwik updater via the shell/command line.
+Configure your server for speed
+
+Use case: a Piwik user reported to us tracking 6.5 Million pages in March 2013, with PHP having only 512M of memory. The following recommendations help configure a server for maximum speed:
+
+Hosting Piwik on a powerful dedicated server is recommended when tracking high traffic websites.
+Piwik (php/Mysql) will benefit from significant RAM memory on the server: 1Gb memory being the minimum recommended for Piwik to process reports on very large websites, the more RAM the better!
+It is critical to use a PHP cache for high performance, we recommend using APC.
+It is recommended to use light web servers such as Nginx or lighttpd which can be faster and more efficient alternatives to Apache or IIS
+Do not use Piwik on a shared/cluster/network filesystem such as NFS or glusterfs. Network filesystems are slower, and will create a big overhead on top of Piwik. Please use standard filesystems for all Piwik files.
+For advanced users, you can setup Piwik to work in a load balanced environment and use multiple servers behind a load balancer.
+Tracker: by default Piwik detects the Internet provider by doing a reverse DNS lookup, which adds a few milliseconds overhead. If you want to track your visitors’ ISPs it will be faster to use either MaxMind’s ISP or Organization. Read more about installing them here. Alternatively, for optimal performance you may disable the Provider plugin and skip the potentially slow reverse DNS lookup.
+Learn how to setup reliable Piwik tracking for high traffic websites, using the asynchronous access logs bulk loading (advanced users only).
+Configure your database server for speed
+
+A rough estimate of Piwik Mysql database size usage is approximately 1Gb for every 5M page views. If your website tracks 100k page views per day (3M pages per month), you can expect a DB size of ~ 7Gb after 1 year.
+An important factor for achieving good performance is to keep the number of unique URLs tracked low. Please make sure you setup ignored URL parameters you do not wish to count in the URL (such as session ID parameters). The less unique URLs tracked in Piwik the better!
+Piwik performance are heavily tied to Mysql database server performance as all Piwik data is stored and aggregated using Mysql queries. We recommend to use Mysql Tuning Primer or Mysql Tuner tools which will suggest optimal Mysql settings.
+We now use Mysql Innodb tables by default (instead of Myisam) which leads to more reliability. Performance can be improved by tuning Mysql innodb settings. You may increase innodb_buffer_pool_size option as long as it fits into the RAM, which will improve general Piwik performance. You may also set innodb_flush_log_at_trx_commit=2 (reference), which will increase the tracker throughput significantly. See also optimizing Innodb I/O on mysql.com.
+When possible, use Solid-state drives (SSDs) as they are often faster.
+If you have limited database space, it may help to delete old logs, for example visitor logs older than 6 months. It helps keep the database size more manageable.
+If your website tracks 100M+ pages per month), Piwik may start to reach php memory limits or other mysql or hardware limitations. There have also been a few Piwik users tracking more than a billion pageviews over several months. If you need help, get in touch with Piwik experts.

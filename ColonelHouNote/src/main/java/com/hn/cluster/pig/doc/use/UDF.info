@@ -1,0 +1,16 @@
+假设你有如下数据：
+[root@localhost pig]$ cat a.txt 
+uidk  12  3
+hfd 132 99
+bbN 463 231
+UFD 13  10
+现在你要将第二列的值先+500，再-300，然后再÷2.6，那么我们可以这样写：
+grunt> A = LOAD 'a.txt' AS(col1:chararray, col2:double, col3:int);
+grunt> B = FOREACH A GENERATE col1, (col2 + 500 - 300)/2.6, col3;
+grunt> DUMP B;
+(uidk,81.53846153846153,3)
+(hfd,127.6923076923077,99)
+(bbN,255.0,231)
+(UFD,81.92307692307692,10)
+
+把这个计算使用UDF来定义：

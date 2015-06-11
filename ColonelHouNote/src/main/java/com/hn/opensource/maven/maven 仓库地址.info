@@ -1,0 +1,27 @@
+maven 仓库地址：
+
+共有的仓库
+http://repo1.maven.org/maven2/
+http://maven.oschina.net/content/groups/public/
+http://repository.jboss.com/maven2/
+http://repository.sonatype.org/content/groups/public/
+http://mirrors.ibiblio.org/pub/mirrors/maven2/org/acegisecurity/
+
+私有的仓库
+http://repository.codehaus.org/
+http://snapshots.repository.codehaus.org/
+http://people.apache.org/repo/m2-snapshot-repository
+http://people.apache.org/repo/m2-incubating-repository/
+ 
+2、收集的外部仓库地址
+http://www.ibiblio.org/maven/mule/dependencies/maven2/
+
+
+找GAV
+http://mvnrepository.com/
+http://search.maven.org/
+
+http://tianya23.blog.51cto.com/1081650/386908/
+
+oschina插件 
+http://www.waylau.com/use-maven-mirrors/?utm_source=tuicool

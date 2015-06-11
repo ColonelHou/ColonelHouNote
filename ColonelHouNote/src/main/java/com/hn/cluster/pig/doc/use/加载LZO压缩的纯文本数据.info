@@ -1,0 +1,4 @@
+如果你的数据是纯文本经由LZO压缩而成，
+那么你可以用elephant-bird的 com.twitter.elephantbird.pig.store.LzoPigStorage 来加载它：
+A = LOAD '/user/codelast/text-lzo-file' USING com.twitter.elephantbird.pig.store.LzoPigStorage() 
+AS (col1: chararray, col2: int);

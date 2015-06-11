@@ -1,0 +1,6 @@
+ort -u 和 uniq都能起到删除重复信息的功能
+
+sort -u test
+uniq test
+区别:
+uniq所谓的重复是连续出现的相同记录

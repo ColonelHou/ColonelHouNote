@@ -1,0 +1,25 @@
+把两个文件中的数据load进来, 不同文件的列合起来进行group by
+与GROUP操作符一样，COGROUP也是用来分组的，不同的是，COGROUP可以按多个关系中的字段进行分组。
+[hadoop@hadoop ~]$hdfs dfs -cat /pig/data/cogroup/cogroup1.log
+15/01/09 15:34:27 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+uidk  12  3
+hfd 132 99
+bbN 463 231
+UFD 13  10
+[hadoop@hadoop ~]$hdfs dfs -cat /pig/data/cogroup/cogroup2.log
+15/01/09 15:34:34 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+908 uidk  888
+345 hfd 557
+28790 re  00000
+[hadoop@hadoop ~]$cat /opt/trace/wksp/pig/scripts/cogroup.pig
+A = LOAD '/pig/data/cogroup/cogroup1.log' USING PigStorage(' ') AS (acol1:chararray, acol2:int, acol3:int);
+B = LOAD '/pig/data/cogroup/cogroup2.log' USING PigStorage(' ') AS (bcol1:int, bcol2:chararray, bcol3:int);
+C = COGROUP A BY acol1, B BY bcol2;
+STORE C INTO '/pig/data/cogroup/output/';
+[hadoop@hadoop ~]$hdfs dfs -cat /pig/data/cogroup/output/part-r-00000
+15/01/09 15:34:54 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+re      {}      {(28790,re,)}
+UFD     {(UFD,13,)}     {}
+bbN     {(bbN,463,231)} {}
+hfd     {(hfd,132,99)}  {(345,hfd,557)}
+uidk    {(uidk,,12)}    {(908,uidk,)}

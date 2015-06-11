@@ -1,0 +1,9 @@
+hostname
+reboot
+ssh
+hadoop slaves
+hbase regionservers
+hbase-site.xml
+start-dfs.sh
+start-yarn.sh
+start-balancer.sh

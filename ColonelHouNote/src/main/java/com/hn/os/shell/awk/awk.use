@@ -1,0 +1,11 @@
+awk '{print $1}' file  打印第一列
+awk '/MA/' list        打印匹配模式
+awk  '/MA/ {print $1}' file 打印匹配模式后的第一列
+                             默认使用的是空格或制表符分隔的
+awk -F, '/MA/ {print $1}' list   指定分隔符
+===============命令行选项=========
+-f   跟随脚本的文本名
+-F   改变字段分隔符
+-v   跟随var=value
+================================
+sed -f sed.script file | awk -F, '{print $2}'    sed输出当作awk的输入

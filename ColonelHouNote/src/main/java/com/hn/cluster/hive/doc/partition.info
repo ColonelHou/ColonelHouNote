@@ -1,0 +1,74 @@
+实例（static partition）：
+编辑文件：/opt/trace/tmp/partition/test3.txt; /opt/trace/tmp/partition/test4.txt;
+$ cat /opt/trace/tmp/partition/test3.txt
+1,zxm
+2,ljz
+3,cds
+4,mac
+5,android
+6,symbian
+7,wp
+
+$ cat /opt/trace/tmp/partition/test4.txt
+8,zxm
+9,ljz
+10,cds
+11,mac
+12,android
+13,symbian
+14,wp
+建表：
+create table student_tmp(id INT, name STRING)partitioned by(academy STRING, class STRING)row format delimited fields terminated by ',';
+加载数据：
+load data local inpath '/opt/trace/tmp/partition/test3.txt' into table student_tmp partition(academy='computer', class='034');
+load data local inpath '/opt/trace/tmp/partition/test3.txt' into table student_tmp partition(academy='physics', class='034'); 
+查看HDFS：
+[hadoop@hadoopMaster ~]$hdfs dfs -ls -R /opt/hadoop/hive/warehouse/student_tmp
+15/01/05 17:02:34 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+drwxr-xr-x   - hadoop supergroup          0 2015-01-05 14:30 /opt/hadoop/hive/warehouse/student_tmp/academy=computer
+drwxr-xr-x   - hadoop supergroup          0 2015-01-05 16:59 /opt/hadoop/hive/warehouse/student_tmp/academy=computer/class=034
+-rw-r--r--   2 hadoop supergroup         49 2015-01-05 14:30 /opt/hadoop/hive/warehouse/student_tmp/academy=computer/class=034/test3.txt
+-rw-r--r--   2 hadoop supergroup         49 2015-01-05 14:31 /opt/hadoop/hive/warehouse/student_tmp/academy=computer/class=034/test3_copy_1.txt
+-rw-r--r--   2 hadoop supergroup         49 2015-01-05 16:59 /opt/hadoop/hive/warehouse/student_tmp/academy=computer/class=034/test3_copy_2.txt
+drwxr-xr-x   - hadoop supergroup          0 2015-01-05 16:59 /opt/hadoop/hive/warehouse/student_tmp/academy=physics
+drwxr-xr-x   - hadoop supergroup          0 2015-01-05 16:59 /opt/hadoop/hive/warehouse/student_tmp/academy=physics/class=034
+-rw-r--r--   2 hadoop supergroup         49 2015-01-05 16:59 /opt/hadoop/hive/warehouse/student_tmp/academy=physics/class=034/test3.txt
+查询hive:
+hive (default)> select * from student_tmp where academy='physics';
+OK
+student_tmp.id  student_tmp.name        student_tmp.academy     student_tmp.class
+1       zxm     physics 034
+2       ljz     physics 034
+3       cds     physics 034
+4       mac     physics 034
+5       android physics 034
+6       symbian physics 034
+7       wp      physics 034
+Time taken: 0.383 seconds, Fetched: 7 row(s)
+以上是使用静态分区；接下来我们使用动态分区：
+使用动态分区需要设置hive.exec.dynamic.partition参数值为true。
+hive (default)> create table student(id INT, name STRING)partitioned by(academy STRING, class STRING) row format delimited fields terminated by ',';
+OK
+Time taken: 0.677 seconds
+导入数据：
+hive> insert overwrite table student partition(academy, class) select id,name,academy,class from student_tmp where class='034';  
+hive (default)> select * from student where academy='physics';
+OK
+student.id      student.name    student.academy student.class
+7       wp      physics 034
+6       symbian physics 034
+5       android physics 034
+4       mac     physics 034
+3       cds     physics 034
+2       ljz     physics 034
+1       zxm     physics 034
+Time taken: 0.2 seconds, Fetched: 7 row(s)
+[hadoop@hadoopMaster ~]$hdfs dfs -ls -R /opt/hadoop/hive/warehouse/student
+15/01/05 17:12:16 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+drwxr-xr-x   - hadoop supergroup          0 2015-01-05 17:11 /opt/hadoop/hive/warehouse/student/academy=computer
+drwxr-xr-x   - hadoop supergroup          0 2015-01-05 17:11 /opt/hadoop/hive/warehouse/student/academy=computer/class=034
+-rw-r--r--   2 hadoop supergroup        147 2015-01-05 17:11 /opt/hadoop/hive/warehouse/student/academy=computer/class=034/000000_0
+drwxr-xr-x   - hadoop supergroup          0 2015-01-05 17:11 /opt/hadoop/hive/warehouse/student/academy=physics
+drwxr-xr-x   - hadoop supergroup          0 2015-01-05 17:11 /opt/hadoop/hive/warehouse/student/academy=physics/class=034
+-rw-r--r--   2 hadoop supergroup         49 2015-01-05 17:11 /opt/hadoop/hive/warehouse/student/academy=physics/class=034/000000_0
+http://blog.csdn.net/yfkiss/article/details/7794713

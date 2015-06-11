@@ -1,0 +1,62 @@
+http://piwik.org/docs/how-to-secure-piwik/
+
+Table of contents
+Tips that will help you keep your Piwik secure
+List of best practices for the professional Piwik administrator
+The Piwik team does its best to ensure that the Piwik source code is secure. We do this by:
+
+proactively rewarding scientists for finding bugs
+conducting and supporting external professional security reviews
+conducting code reviews on commits
+However, these security steps are restricted to the Piwik software. Once you download and install Piwik, more factors come into play.
+Tips that will help you keep your Piwik secure
+
+There are a few things that you can easily change in your routine to make your data more secure. This page will specifically explain how to harden your Piwik installation. This will ensure that it is difficult for anyone to enter, modify or simply read unwanted data on your server. Please check that the person who installs Piwik and handles the web server has read the following guide and spent some time implementing some or all of these changes.
+
+Here are a few tips to make your Piwik server more secure and analytics data safer:
+
+Install Piwik in a separate MySQL Database
+By doing this you are making sure that if a hacker gains access to your CMS database, they won’t be able to access Piwik, and vice versa.
+Use a New MySQL user and password for your Piwik DB
+If you use the same user and password everywhere, you are making it easy for hackers to access your data.
+Make sure the usernames and passwords are unique for each database, ensuring that SQL injection would only impact one product.
+Always use Piwik over https://
+Sensitive information in Piwik includes the login, password, and token_auth (used for API authentication). This information is regularly included in the responses from the Piwik server, and could be viewed by anyone seeing the traffic. Public or unencrypted Wi-fi networks are easy to spy on. The solution is relatively simple: if you really care about your security and want to make sure that nobody could access your password or API tokens, make sure you always connect to Piwik over https://
+Turn on automatic SSL redirection in your Piwik: see FAQ.
+Use .htaccess to restrict access to a few files only, and restrict by IP address
+If you use an Apache web server, it’s easy to use .htaccess files to restrict access to Piwik to your IP address, or many more options. Check out the examples in the htaccess forum post.
+You can, for example, restrict access to all files to your IP only, and only allow external access to piwik.php and piwik.js (the only 2 files required for tracking)
+Back up your Piwik config/config.ini.php and the complete MySQL Database
+Back up the config file and the MySQL Database, and make sure you test restoring it from the backup to ensure it is complete!
+The config file is the file which holds the status of your Piwik install, including the MySQL password, so make sure you handle it safely.
+Use the latest PHP, MySQL, web server (Apache/Nginx), Operating System (Linux)
+Performance and security updates are often released by these popular tools required by Piwik.
+We highly recommend that you only use free software, for example Linux+Apache/Nginx and use the latest versions.
+Often, you can also configure each piece of software to increase security e.g. enabling the firewall in your OS, using .htaccess in Apache, etc.
+Subscribe to the Piwik changelog & keep Piwik up-to-date
+When security issues are reported, we try to fix them as soon as possible and release a new version.
+We highly recommend that you subscribe to the Changelog and keep your Piwik up-to-date (have you tried the one-click automatic upgrade?).
+Enable the Piwik Security Plugin and Modify all Security Issues to green
+In Piwik, click on the admin link Marketplace and then install the SecurityInfo plugin which will automatically test your Piwik server security and reports a list of security recommendations.
+For example, it tests to make sure that the PHP and Piwik versions are the latest, that display_errors, magic_quotes_gpc are disabled, and many other tests.
+We highly recommend that all Piwik administrators enable the SecurityInfo plugin, and then view the Administration > Security menu. You can update the server and PHP configurations to follow the recommendations and try to have all items in green.
+
+In particular, check that you disabled the php setting ‘display_errors’ and instead log all errors in a error log file.
+
+List of best practices for the professional Piwik administrator
+
+Here are our best practices for the professional Piwik administrator:
+
+Always use strong, complicated, new passwords
+Using secure passwords for all of your Piwik users, all users with Super User access, and your Piwik MySQL database, are fundamental ways to boost your security.
+Use the Strong Password Generator if you can’t come up with one on your own.
+Use SSH (or sFTP) rather than FTP
+These days, it is easy to listen on wi-fi networks and sniff traffic. Make sure that all of your connections to the Piwik server are encrypted and nobody can see your logins or password.
+If you must use FTP, do not store the password in your ftp software (which would be easy prey for malware already running on many Windows computers).
+Keep your own PC up-to-date
+Always keep your own computer up to date, including the Flash plugin, your browser(s), and operating system.On a Windows computer, always use a virus checker to minimize the risk of malware. Do not use Acrobat Reader: it has had too many severe security holes in the past. Instead, use Sumatra PDF.
+Change Piwik settings to respect your Users Privacy
+Check out our guide to Enable Privacy features in Piwik and learn more about data privacy for your website visitors’ data.
+A final security tip: use Firefox for all your web browsing.
+The best free software browser!
+If you have any feedback or additions to this list, please let us know at security at piwik.org.

@@ -1,0 +1,1 @@
+transient代表对象的临时数据；static和transient类型的成员数据不能被串行化。

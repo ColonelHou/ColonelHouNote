@@ -1,0 +1,11 @@
+yum install e2fsprogs-devel
+yum install glibc-headers
+yum install gcc
+yum install gcc-c++
+yum install make
+yum install cmake
+yum install openssl-devel
+yum install ncurses-devel
+
+yum install php php-devel php-mysql php-gd php-imap php-ldap php-odbc php-pear php-xml php-xmlrpc php-mbstring
+yum groupinstall “Development tools”

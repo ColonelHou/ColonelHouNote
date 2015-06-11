@@ -1,0 +1,112 @@
+wget http://archive.apache.org/dist/kafka/0.8.1/kafka_2.10-0.8.1.tgz
+tar zxvf kafka_2.10-0.8.1.tgz #分别在三台服务器上安装kafka
+修改每台服务器的config/server.properties 
+broker.id：  每台机器唯一，填数字，本文中分别为132/133/134
+host.name：每台机器唯一，填服务器IP/hostname
+advertised.host.name=hadoopMasterTest 同上
+log.dirs=/usr/local/kafka_2.10-0.8.1/log  配置日志路经
+zookeeper.connect=192.168.40.134:2181,192.168.40.132:2181,192.168.40.133:2181 注意在配置ZK的时候，如果启动失败，则在zoo.cfg中serverx.x不行的话就使用hostname，
+修改每台服务器的config/consumer.properties
+zookeeper.connect=hadoopMasterTest:2181,hadoopSlave1Test:2181,hadoopSlave2Test:2181
+
+
+kafka-server-start.sh $KAFKA_HOME/config/server.properties
+kafka-server-stop.sh $KAFKA_HOME/config/server.properties
+kafka-topics.sh --create --topic ColonelFirstTopic --replication-factor 3 --partitions 2 --zookeeper hadoopMasterTest:2181
+kafka-console-producer.sh --broker-list hadoopMasterTest:9092 --sync --topic ColonelFirstTopic
+
+
+4)启动kafka服务, 在zk1,zk2,zk3上分别运行：
+	[hadoop@hadoopMasterTest ~]$kafka-server-start.sh $KAFKA_HOME/config/server.properties
+	[2015-04-02 00:14:04,375] INFO Verifying properties (kafka.utils.VerifiableProperties)
+	[2015-04-02 00:14:04,405] INFO Property advertised.host.name is overridden to hadoopMasterTest (kafka.utils.VerifiableProperties)
+	[2015-04-02 00:14:04,406] INFO Property broker.id is overridden to 131 (kafka.utils.VerifiableProperties)
+	[2015-04-02 00:14:04,406] INFO Property host.name is overridden to hadoopMasterTest (kafka.utils.VerifiableProperties)
+	...
+	[2015-04-02 00:14:04,619] INFO Completed load of log test-0 with log end offset 2 (kafka.log.Log)
+	SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
+	SLF4J: Defaulting to no-operation (NOP) logger implementation
+	SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
+	[2015-04-02 00:14:04,629] INFO Starting log cleanup with a period of 60000 ms. (kafka.log.LogManager)
+	...
+	[2015-04-02 00:23:02,436] INFO Closing socket connection to /192.168.11.135. (kafka.network.Processor)
+	[2015-04-02 00:24:24,061] INFO Closing socket connection to /192.168.11.132. (kafka.network.Processor)
+	[2015-04-02 00:43:39,260] INFO Closing socket connection to /192.168.11.135. (kafka.network.Processor)
+5) 新建一个TOPIC(replication-factor=num of brokers)
+	[hadoop@hadoopSlave1Test ~]$kafka-topics.sh --create --topic ColonelFirstTopic --replication-factor 3 --partitions 2 --zookeeper hadoopMasterTest:2181
+	Created topic "ColonelFirstTopic".
+6)假设我们在zk2上，开一个终端，发送消息至kafka（zk2模拟producer）
+	[hadoop@hadoopSlave1Test ~]$kafka-console-producer.sh --broker-list hadoopMasterTest:9092 --sync --topic ColonelFirstTopic
+	SLF4J: The requested version 1.5.8 by your slf4j binding is not compatible with [1.6, 1.7]
+	SLF4J: See http://www.slf4j.org/codes.html#version_mismatch for further details.
+	Hello World
+	haha
+	How are you ?
+	在此终端输入：Hello Kafka
+7)假设我们在zk3上，开一个终端，显示消息的消费（zk3模拟consumer）
+	[hadoop@hadoopSlave2Test ~]$kafka-console-consumer.sh --zookeeper hadoopMasterTest:2181 --topic ColonelFirstTopic --from-beginning
+	SLF4J: The requested version 1.5.8 by your slf4j binding is not compatible with [1.6, 1.7]
+	SLF4J: See http://www.slf4j.org/codes.html#version_mismatch for further details.
+	Hello World
+	haha
+	How are you ?
+	在此消费消息的终端显示：Hello Kafka
+8)查看TOPICs
+	[hadoop@hadoopMasterTest ~]$kafka-topics.sh --list --zookeeper hadoopMasterTest:2181
+	ColonelFirstTopic
+	test
+9)查看topic详细信息
+[hadoop@hadoopMasterTest ~]$kafka-topics.sh --describe --zookeeper hadoopMasterTest:2181
+Topic:ColonelFirstTopic	PartitionCount:2	ReplicationFactor:3	Configs:
+	Topic: ColonelFirstTopic	Partition: 0	Leader: 1	Replicas: 1,131,2	Isr: 1,131,2
+	Topic: ColonelFirstTopic	Partition: 1	Leader: 2	Replicas: 2,1,131	Isr: 2,1,131
+Topic:test	PartitionCount:2	ReplicationFactor:1	Configs:
+	Topic: test	Partition: 0	Leader: 131	Replicas: 131	Isr: 131
+	Topic: test	Partition: 1	Leader: 1	Replicas: 1	Isr: 1
+10)Now let's test out fault-tolerance. Broker 1 was acting as the leader so let's kill it:
+	[hadoop@hadoopSlave2Test ~]$jps
+	64151 Kafka
+	65258 Jps
+	...
+	[hadoop@hadoopSlave2Test ~]$kill -9 64151
+	[hadoop@hadoopSlave2Test ~]$kafka-topics.sh --describe --zookeeper hadoopMasterTest:2181
+	Topic:ColonelFirstTopic	PartitionCount:2	ReplicationFactor:3	Configs:
+		Topic: ColonelFirstTopic	Partition: 0	Leader: 1	Replicas: 1,131,2	Isr: 1,131,2
+		Topic: ColonelFirstTopic	Partition: 1	Leader: 1	Replicas: 2,1,131	Isr: 1,131
+	Topic:test	PartitionCount:2	ReplicationFactor:1	Configs:
+		Topic: test	Partition: 0	Leader: 131	Replicas: 131	Isr: 131
+		Topic: test	Partition: 1	Leader: 1	Replicas: 1	Isr: 1
+	But the messages are still be available for consumption even though the leader that took the writes originally is down:
+	[hadoop@hadoopSlave2Test ~]$kafka-console-consumer.sh --zookeeper hadoopMasterTest:2181 --topic ColonelFirstTopic --from-beginning
+	SLF4J: The requested version 1.5.8 by your slf4j binding is not compatible with [1.6, 1.7]
+	SLF4J: See http://www.slf4j.org/codes.html#version_mismatch for further details.
+	Hello World
+	haha
+	How are you ?
+	fdasfsdfasfasdfas
+11)stop kafka server no each node:
+	[hadoop@hadoopMasterTest ~]$kafka-server-stop.sh /usr/local/kafka_2.10-0.8.1/config/server.properties
+	[hadoop@hadoopMasterTest ~]$jps
+	62312 ResourceManager
+	62039 NameNode
+	23951 Jps
+	22174 QuorumPeerMain
+
+	
+问题：
+一：SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder". 下载slftj-nop-1.5.jar到kafka的libs目录下
+入源代码根目录，输入 ./gradlew eclipse命令，会生成各个子项目的eclipse目录，下载时间会较长，耐心等待，生成的子目录
+
+http://blog.chinaunix.net/uid-20196318-id-2420884.html
+KAFKA分布式消息系统 
+
+http://www.chinahadoop.cn/course/64
+《Kafka开发与实践》美团李志涛，8月27日，晚19：30-21:30
+
+http://blog.csdn.net/desilting/article/details/22872839
+Kafka 安装配置
+ kafka测试
+ 
+ 
+http://my.oschina.net/frankwu/blog/355298
+【采集层】Kafka 与 Flume 如何选择

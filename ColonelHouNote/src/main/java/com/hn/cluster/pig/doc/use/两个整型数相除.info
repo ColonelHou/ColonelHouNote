@@ -1,0 +1,38 @@
+，如何转换为浮点型，从而得到正确的结果
+这个问题其实很傻，或许不用说你也知道了：假设有int a = 3 和 int b = 2两个数，在大多数编程语言里，a/b得到的是1，想得到正确结果1.5的话，需要转换为float再计算。在Pig中其实和这种情况一样，下面就拿几行数据来做个实验：
+
+[root@localhost ~]# cat a.txt 
+3 2
+4 5
+在Pig中：
+
+grunt> A = LOAD 'a.txt' AS (col1:int, col2:int);                  
+grunt> B = FOREACH A GENERATE col1/col2;
+grunt> DUMP B;
+(1)
+(0)
+可见，不加类型转换的计算结果是取整之后的值。
+那么，转换一下试试：
+
+grunt> A = LOAD 'a.txt' AS (col1:int, col2:int);
+grunt> B = FOREACH A GENERATE (float)(col1/col2);
+grunt> DUMP B;
+(1.0)
+(0.0)
+这样转换还是不行的，这与大多数编程语言的结果一致——它只是把取整之后的数再转换为浮点数，因此当然是不行的。
+文章来源：http://www.codelast.com/
+正确的做法应该是：
+
+grunt> A = LOAD 'a.txt' AS (col1:int, col2:int); 
+grunt> B = FOREACH A GENERATE (float)col1/col2;  
+grunt> DUMP B;
+(1.5)
+(0.8)
+或者这样也行：
+
+grunt> A = LOAD 'a.txt' AS (col1:int, col2:int);
+grunt> B = FOREACH A GENERATE col1/(float)col2;       
+grunt> DUMP B;
+(1.5)
+(0.8)
+这与我们的通常做法是一致的，因此，你要做除法运算的时候，需要注意这一点。

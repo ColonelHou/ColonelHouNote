@@ -1,0 +1,11 @@
+大家知道，使用UDF需要在Pig脚本中REGISTER该UDF的jar包，但你可能不知道，你也可以不在Pig脚本中REGISTER它，而是通过命令行指定：
+
+pig -Dpig.additional.jars=/home/codelast/a.jar:/home/codelast/b.jar:/home/codelast/c.jar test.pig
+以上命令告诉了我们几件事：
+①我们让Pig执行了test.pig脚本；
+②我们向Pig传入了“pig.additional.jars”这样一个参数，此参数的作用相当于在Pig脚本中REGISTER jar包；
+③如果你要REGISTER多个jar包，只需像上面的例子一样，用分号(:)把多个jar包路径隔开即可；
+④test.pig必须写在最后，而不能写成“pig test.pig -Dpig.additional.jars=XXX”这样，否则Pig直接报错：
+
+ERROR 2999: Unexpected internal error. Encountered unexpected arguments on command line - please check the command line.
+当然，为了可维护性好，你最好把REGISTER jar包写在Pig脚本中，不要通过命令行传入。

@@ -1,0 +1,37 @@
+下载scala, spark减压,
++---------------------------------------------------------------------
+配置：vim /etc/profile
+export SCALA_HOME=/usr/local/scala
+export PATH=$SCALA_HOME/bin:$PATH
+export SPARK_HOME=/usr/local/spark
+export PATH=$SPARK_HOME/bin:$PATH
++---------------------------------------------------------------------
+vim spark-env.sh
+JAVA_HOME=/usr/java/jdk
+export HADOOP_HOME=/usr/lib/hadoop
+export HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop
+export HADOOP_MAPRED_HOME=$HADOOP_HOME
+export HADOOP_COMMON_HOME=$HADOOP_HOME
+export HADOOP_HDFS_HOME=$HADOOP_HOME
+export YARN_HOME=$HADOOP_HOME
+export HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop
+export HDFS_CONF_DIR=$HADOOP_HOME/etc/hadoop
+export YARN_CONF_DIR=$HADOOP_HOME/etc/hadoop
+export SPARK_HOME=/usr/local/spark
+export SPARK_PID_DIR=/usr/local/spark/pid
+export SPARK_MASTER_IP=127.0.0.1
+export SPARK_MASTER_PORT=7077
+export SPARK_MASTER_WEBUI_PORT=8099
+
+export SPARK_WORKER_CORES=3 #每个Worker使用的CPU核数
+export SPARK_WORKER_INSTANCES=1 #每个Slave中启动几个Worker实例
+export SPARK_WORKER_MEMORY=10G #每个Worker使用多大的内存
+export SPARK_WORKER_WEBUI_PORT=8081 #Worker的WebUI端口号
+export SPARK_EXECUTOR_CORES=1 #每个Executor使用使用的核数
+export SPARK_EXECUTOR_MEMORY=1G #每个Executor使用的内存
++---------------------------------------------------------------------
+cd /usr/local/spark/sbin
+./start-all.sh
+starting org.apache.spark.deploy.master.Master, logging to /usr/local/spark/sbin/../logs/spark-root-org.apache.spark.deploy.master.Master-1-traceMaster.out
+localhost: starting org.apache.spark.deploy.worker.Worker, logging to /usr/local/spark/logs/spark-root-org.apache.spark.deploy.worker.Worker-1-traceMaster.out
++---------------------------------------------------------------------

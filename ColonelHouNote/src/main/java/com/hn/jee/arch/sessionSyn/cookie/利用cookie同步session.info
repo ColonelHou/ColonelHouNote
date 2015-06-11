@@ -1,0 +1,12 @@
+session是存放在服务器端的，cookie是存放在客户端的
+把用户访问页面产生的session放到cookie里面，就是以cookie为中转站。
+你访问web服务器A，产生了session把它放到cookie里面了，你访问被分配到web服务器B，
+这个时候，web服务器B先判断服务器有没有这个session，
+如果没有，在去看看客户端的cookie里面有没有这个session，如果也没有，说明session真的不存，
+如果cookie里面有，就把cookie里面的sessoin同步到web服务器B，这样就可以实现session的同步了。
+
+
+
+
+
+http://www.cnblogs.com/huangfox/archive/2010/11/03/1867910.html

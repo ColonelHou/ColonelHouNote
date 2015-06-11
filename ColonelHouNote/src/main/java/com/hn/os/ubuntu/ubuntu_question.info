@@ -1,0 +1,16 @@
+ubuntu启动后电脑屏幕只显示一白横杠问题：
+开机进入恢复模式->选择含有root的那一项->运行->fsck -y -t ext4 /dev/sda7命令->reboot
+
+安装插件
+sudo apt-get install flashplugin-nonfree
+
+取消代理export http_proxy=""
+
+开户热点
+
+安装五笔：
+1:命令:sudo apt-get install ibus ibus-table ibus-table-wubi
+3:打开System setting面板，点击language support,在Keyboard input method system右边的下拉框中选中ibus,退出 注销，
+再次进入系统然后添加五笔输入法。
+
+setterm -blank 0 //禁用屏保 setterm -blank 1 //1分钟后开始屏保

@@ -1,0 +1,21 @@
+假设你有如下数据文件：
+[root@localhost ~]# cat a.txt 
+1 http://ui.qq.com/abcd.html
+5 http://tr.qq.com/743.html
+8 http://vid.163.com/trees.php
+9 http:auto.qq.com/us.php
+现在要找出该文件中，第二列符合“*//*.qq.com/*”模式的所有行（此处只有前两行符合条件），怎么做？
+Pig代码如下：
+A = LOAD 'a.txt' AS (col1: int, col2: chararray);
+B = FILTER A BY col2 matches '.*//.*\\.qq\\.com/.*';  
+DUMP B;
+我们看到，matches关键字对 col2 进行了正则匹配，它使用的是Java格式的正则表达式匹配规则。
+. 表示任意字符，* 表示字符出现任意次数；\. 对 . 进行了转义，表示匹配 . 这个字符；/ 就是表示匹配 / 这个字符。
+这里需要注意的是，在引号中，用于转义的字符 \ 需要打两个才能表示一个，所以上面的 \\. 就是与正则中的 \. 是一样的，即匹配 . 这个字符。所以，如果你要匹配数字的话，应该用这种写法（\d表示匹配数字，在引号中必须用\\d）：
+
+B = FILTER A BY (col matches '\\d.*');
+文章来源：http://www.codelast.com/
+最后输出结果为：
+(1,http://ui.qq.com/abcd.html)
+(5,http://tr.qq.com/743.html)
+可见结果是正确的。

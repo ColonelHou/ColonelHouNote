@@ -1,0 +1,1 @@
+pig -param output_dir="/my_ourput_dir/" my_pig_script.pig

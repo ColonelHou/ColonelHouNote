@@ -1,0 +1,8 @@
+选项										类型		默认值	描述
+mapred.reduce.slowstart.completed.maps  float   0.05    调用reduce之前，map必须完成的最少比例
+mapred.reduce.parallel.copies			int		5		每个reduce并行下载map结果的最大线程数
+mapred.reduce.copy.backoff				int		300		reduce下载线程最大等待时间（in sec）
+io.sort.factor							int		10		同上
+mapred.job.shuffle.input.buffer.percent	float	0.7		用来缓存shuffle数据的reduce task heap百分比
+mapred.job.shuffle.merge.percent		float	0.66	缓存的内存中多少百分比后开始做merge操作
+mapred.job.reduce.input.buffer.percent	float	0.0		sort完成后reduce计算阶段用来缓存数据的百分比

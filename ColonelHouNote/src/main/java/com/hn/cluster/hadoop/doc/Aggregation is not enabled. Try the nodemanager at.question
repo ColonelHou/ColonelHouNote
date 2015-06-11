@@ -1,0 +1,5 @@
+<property>  
+    <name>yarn.log-aggregation-enable</name>  
+    <value>true</value>  
+</property>   
+in yarn-site.xml to enable log aggregation.

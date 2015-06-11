@@ -1,0 +1,50 @@
+由于 memcache 使用了libevent 来进行高效的网络连接处理，因此在安装memcache 之前，
+需要先安装libevent
+wget http://download.chinaunix.net/down.php?id=43215&ResourceID=5804&site=1
+tar -xf xxx.tar.gz
+sudo ./configure
+sudo make
+sudo make install
+wget http://www.memcached.org/files/memcached-1.4.21.tar.gz
+tar -xf xxx.tar.gz
+sudo ./configure
+sudo make
+sudo make install
+启动memcache 服务：
+[hadoop@hadoopMaster ~]$ sudo /usr/local/bin/memcached -d -m 10 -u root -l 192.168.10.19 -p 11211 -c 32 -P /tmp/memcached.pid
+参数的含义如下：
+ -d 表示启动的是一个守护进程；
+ -m 指定分配给memcache 的内存数量，单位是MB，这里指定的是10 MB。
+ -u 指定运行memcache 的用户，这里指定的是root；
+ -l 指定监听的服务器的IP 地址；
+ -p 设置memcache 监听的端口，这里指定的是11211；
+ -c 指定最大允许的并发连接数，这里设置为32；
+ -P 指定memcache 的pid 文件保存的位置。
+启动报错：error while loading shared libraries: libevent-2.0.so.5: cannot open shared object file: No such file or directory
+原因：安装memcache时，需要建立文件索引或者说文件连接（link），类似windows下的快捷方式
+[hadoop@hadoopMaster ~]$whereis libevent-2.0.so.5
+libevent-2.0.so.5: /usr/local/lib/libevent-2.0.so.5
+[hadoop@hadoopMaster ~]$sudo ldd /usr/local/bin/memcached
+        linux-vdso.so.1 =>  (0x00007fffc28c7000)
+        libevent-2.0.so.5 => not found
+        librt.so.1 => /lib64/librt.so.1 (0x00000035e3800000)
+        libpthread.so.0 => /lib64/libpthread.so.0 (0x00000035e3400000)
+        libc.so.6 => /lib64/libc.so.6 (0x00000035e3000000)
+        /lib64/ld-linux-x86-64.so.2 (0x00000035e2800000)
+[hadoop@hadoopMaster ~]$sudo ln -s /usr/local/lib/libevent-2.0.so.5 /usr/lib64/libevent-2.0.so.5
+[hadoop@hadoopMaster ~]$sudo ldd /usr/local/bin/memcached
+[hadoop@hadoopMaster ~]$sudo ldd /usr/local/bin/memcached
+        linux-vdso.so.1 =>  (0x00007fffd17ff000)
+        libevent-2.0.so.5 => /usr/lib64/libevent-2.0.so.5 (0x00007faa01335000)
+        librt.so.1 => /lib64/librt.so.1 (0x00000035e3800000)
+        libpthread.so.0 => /lib64/libpthread.so.0 (0x00000035e3400000)
+        libc.so.6 => /lib64/libc.so.6 (0x00000035e3000000)
+        /lib64/ld-linux-x86-64.so.2 (0x00000035e2800000)
+ldd命令用于判断某个可执行的 binary 档案含有什么动态函式库。
+现在好啦
+[hadoop@hadoopMaster ~]$sudo /usr/local/bin/memcached -d -m 10 -u root -l 192.168.13.17 -p 11211 -c 32 -P /tmp/memcached.pid
+[hadoop@hadoopMaster ~]$ps -ef | grep memcached
+root      7285     1  0 10:38 ?        00:00:00 /usr/local/bin/memcached -d -m 10 -u root -l 192.168.13.17 -p 11211 -c 32 -P /tmp/memcached.pid
+hadoop    7292 32384  0 10:38 pts/0    00:00:00 grep memcached
+关闭memcache 服务：
+kill `cat /tmp/memcached.pid`

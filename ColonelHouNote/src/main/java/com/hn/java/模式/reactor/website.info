@@ -1,0 +1,15 @@
+http://www.blogjava.net/baoyaer/articles/87514.html
+NIO主要原理和适用。
+
+NIO 有一个主要的类Selector,这个类似一个观察者，
+只要我们把需要探知的socketchannel告诉Selector,我们接着做别的事情，
+当有事件发生时，他会通知我们，传回一组SelectionKey,我们读取这些Key,
+就会获得我们刚刚注册过的socketchannel,然后，我们从这个Channel中读取数据，
+放心，包准能够读到，接着我们可以处理这些数据。
+
+Selector内部原理实际是在做一个对所注册的channel的轮询访问，不断的轮询(目前就这一个算法)，
+一旦轮询到一个channel有所注册的事情发生，比如数据来了，他就会站起来报告，交出一把钥匙，
+让我们通过这把钥匙来读取这个channel的内容。
+
+用于解决多用户访问并发问题
+http://daimojingdeyu.iteye.com/blog/828696

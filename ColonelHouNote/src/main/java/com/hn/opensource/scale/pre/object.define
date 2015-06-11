@@ -1,0 +1,37 @@
+类(class)
+	类是对象的模板，通过构造类，能够使用new关键字声明一系列同结构的对象
+	class HELLOWORLD{
+	private val value1 = “HELLO”
+	var value2 = “WORLD“
+	def add() { println(value1+value2) }
+	def plus(m:Char)=value2+m
+	}
+	类成员主要包括字段(val跟var)、方法与函数(def)，但Scala禁止使用同样的名称命名字段和方法，即既声明一个value字段，又声明一个value方法是不允许的
+	类成员可见性有两种，private(私有)跟public(公有)，private需要声明，public无需额外声明
+	类声明后利用new声明对象
+	val one= new HELLOWORLD
+        对象的操作
+    val a=one.value1
+    val b=one.value2
+    one.value2=one.plus(H)//
+    one.add()
+  调用无参方法时可以不带()
+    one.add
+  若类中声明无参方法时不带()，实际调用也不可带()
+    ...def add{ println(value1+value2) }...
+    one.add()//错误
+	-------getter--setter-----------
+		Scala对每个类中的字段都提供getter和setter方法
+	  对于公有字段来说，其getter和setter方法同样是共有的，对于私有字段来说，则是私有的
+	  var声明的字段带有getter和setter方法(读写)
+	  val声明的字段自带有getter方法(只读)
+	  对于字段value1，其getter形式为value1，并没有setter方法
+	  对于字段value2，其getter和setter方法形式为value2和value2_=
+	  实际使用时，在类定义外，getter和setter方法使用是一致的，形如one.value2
+	  getter方法与setter方法的意义在于什么地方呢？
+对象(object)
+	除了使用类构造对象模板，可以使用object构造单例对象
+继承
+	继承是类的拓展
+特质
+	一个类只能继承自一个父类，但可以由多个特质拓展而成

@@ -1,0 +1,2 @@
+在Pig脚本开头加上一句：
+set job.name 'My-Job-Name';

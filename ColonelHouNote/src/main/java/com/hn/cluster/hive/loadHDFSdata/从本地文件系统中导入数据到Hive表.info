@@ -1,0 +1,33 @@
+
+首先创建普通表：
+hive (testdb)> create table stu(id int, name string) ROW format delimited fields                                                                                              terminated by ',' stored as textfile;
+OK
+Time taken: 0.136 seconds
+---------------------------------------------------------------------------------
+[hadoop@hadoop]$cat stu.txt
+1001,tom
+1002,jim
+1003,lily
+1004,lucy
+---------------------------------------------------------------------------------
+hive (testdb)> load data local inpath '/opt/trace/tmp/hive/test.txt' overwrite i                                                                                             nto table stu;
+Copying data from file:/opt/trace/tmp/hive/test.txt
+Copying file: file:/opt/trace/tmp/hive/test.txt
+Loading data to table testdb.stu
+rmr: DEPRECATED: Please use 'rm -r' instead.
+Deleted hdfs://hadoopMaster:9000/opt/hadoop/hive/warehouse/testdb.db/stu
+Table testdb.stu stats: [numFiles=1, numRows=0, totalSize=38, rawDataSize=0]
+OK
+Time taken: 0.804 seconds
+hive (testdb)> select * from stu;
+OK
+stu.id  stu.name
+1001    tom
+1002    jim
+1003    lily
+1004    lucy
+Time taken: 0.083 seconds, Fetched: 4 row(s)
+---------------------------------------------------------------------------------
+
+
+http://www.iteblog.com/archives/949

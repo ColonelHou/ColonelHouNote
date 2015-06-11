@@ -1,0 +1,5 @@
+问题：我起了2个spark-shell 是不是应该有2个Applications？为啥界面一个都没有呢？
+情况：直接运行 spark-shell ，不加参数
+分析：比如，以spark-shell 命令直接运行，此时，在spark的集群界面上是没有对应Applications信息的。
+只有在命令中指定--master masterURL，其中masterURL对应集群的Masster URL地址，可以参考8080端口的web ui(默认），如下图，后面的
+直接从界面把URL: 后面的内容拷贝过来

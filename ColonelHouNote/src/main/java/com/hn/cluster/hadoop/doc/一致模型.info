@@ -1,0 +1,14 @@
+FS的一致模型描述了对文件读/写的数据可见性。
+注意：
+1.在创建一个文件后，希望它能在FS的立即可见，如下：
+  Path p = new Path("p");
+  FS.create(p);
+  assertThat(FS.exists(p), is(true))
+  写入文件的内容不保证能立即可见，即使Data流已经刷新并存储。 文件长度显示还是0，如下：
+  Path p = new Path("p");
+  OutputStream out = FS.create(p);
+  out.write("content".getBytes("UTF-8"));
+  out.flush();
+  assertThat(fs.getFileStatus(p).getLen(), is(0L))
+  注意当写入的Data超过一个块后，新的reader就能看见第一个块。之后的块也一样，
+  总之，其他reader看不见当前正在写入的块.

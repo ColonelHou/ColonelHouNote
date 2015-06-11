@@ -1,0 +1,5 @@
+ed xxx.txt
+p打印当前行内容
+g/regular/d  匹配所有的删除掉
+1输入N就跳到N行
+s/ou/OU/g 同一行出现多个

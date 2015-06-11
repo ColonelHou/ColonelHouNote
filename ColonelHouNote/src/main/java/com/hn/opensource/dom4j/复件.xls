@@ -1,0 +1,154 @@
+<?xml version="1.0"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:o="urn:schemas-microsoft-com:office:office"
+ xmlns:x="urn:schemas-microsoft-com:office:excel"
+ xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:html="http://www.w3.org/TR/REC-html40">
+ <DocumentProperties xmlns="urn:schemas-microsoft-com:office:office">
+  <Author>ed woychowsky</Author>
+  <LastAuthor>Edmond Woychowsky</LastAuthor>
+  <Created>2007-01-26T16:54:15Z</Created>
+  <LastSaved>2007-01-27T05:18:54Z</LastSaved>
+  <Company>None</Company>
+  <Version>12.00</Version>
+ </DocumentProperties>
+ <OfficeDocumentSettings xmlns="urn:schemas-microsoft-com:office:office">
+  <DownloadComponents/>
+  <LocationOfComponents HRef="D:"/>
+ </OfficeDocumentSettings>
+ <ExcelWorkbook xmlns="urn:schemas-microsoft-com:office:excel">
+  <WindowHeight>8700</WindowHeight>
+  <WindowWidth>11355</WindowWidth>
+  <WindowTopX>480</WindowTopX>
+  <WindowTopY>120</WindowTopY>
+  <ActiveSheet>2</ActiveSheet>
+  <ProtectStructure>False</ProtectStructure>
+  <ProtectWindows>False</ProtectWindows>
+ </ExcelWorkbook>
+ <Styles>
+  <Style ss:ID="Default" ss:Name="Normal">
+   <Alignment ss:Vertical="Bottom"/>
+   <Borders/>
+   <Font ss:FontName="Arial" x:Family="Swiss"/>
+   <Interior/>
+   <NumberFormat/>
+   <Protection/>
+  </Style>
+  <Style ss:ID="s62">
+   <Font ss:FontName="宋体" x:CharSet="134"/>
+  </Style>
+ </Styles>
+ <Worksheet ss:Name="student">
+  <Table ss:ExpandedColumnCount="3" ss:ExpandedRowCount="5" x:FullColumns="1"
+   x:FullRows="1">
+   <Row>
+    <Cell><Data ss:Type="String">name</Data></Cell>
+    <Cell><Data ss:Type="String">age</Data></Cell>
+    <Cell><Data ss:Type="String">address</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">tom</Data></Cell>
+    <Cell><Data ss:Type="Number">22</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">陕西省西安市</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">jim</Data></Cell>
+    <Cell><Data ss:Type="Number">23</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">北京市</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">lily</Data></Cell>
+    <Cell><Data ss:Type="Number">22</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">南京市</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">lucy</Data></Cell>
+    <Cell><Data ss:Type="Number">21</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">天津市</Data></Cell>
+   </Row>
+  </Table>
+  <WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel">
+   <Print>
+    <ValidPrinterInfo/>
+    <HorizontalResolution>600</HorizontalResolution>
+    <VerticalResolution>0</VerticalResolution>
+   </Print>
+   <Panes>
+    <Pane>
+     <Number>3</Number>
+     <ActiveRow>29</ActiveRow>
+     <ActiveCol>2</ActiveCol>
+    </Pane>
+   </Panes>
+   <ProtectObjects>False</ProtectObjects>
+   <ProtectScenarios>False</ProtectScenarios>
+  </WorksheetOptions>
+ </Worksheet>
+ <Worksheet ss:Name="course">
+  <Table ss:ExpandedColumnCount="2" ss:ExpandedRowCount="4" x:FullColumns="1"
+   x:FullRows="1">
+   <Column ss:Width="68.25"/>
+   <Row>
+    <Cell><Data ss:Type="String">courseID</Data></Cell>
+    <Cell><Data ss:Type="String">courseName</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="Number">20081420</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">语文</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="Number">2009215121</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">数学</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="Number">20015579815</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">英语</Data></Cell>
+   </Row>
+  </Table>
+  <WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel">
+   <Panes>
+    <Pane>
+     <Number>3</Number>
+     <ActiveRow>27</ActiveRow>
+     <ActiveCol>2</ActiveCol>
+    </Pane>
+   </Panes>
+   <ProtectObjects>False</ProtectObjects>
+   <ProtectScenarios>False</ProtectScenarios>
+  </WorksheetOptions>
+ </Worksheet>
+ <Worksheet ss:Name="teacher">
+  <Table ss:ExpandedColumnCount="2" ss:ExpandedRowCount="4" x:FullColumns="1"
+   x:FullRows="1">
+   <Row>
+    <Cell><Data ss:Type="String">teacherID</Data></Cell>
+    <Cell><Data ss:Type="String">teacherName</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="Number">1003</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">张教师</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="Number">1004</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">王教师</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="Number">1005</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">赵教师</Data></Cell>
+   </Row>
+  </Table>
+  <WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel">
+   <Selected/>
+   <Panes>
+    <Pane>
+     <Number>3</Number>
+     <ActiveCol>1</ActiveCol>
+     <RangeSelection>C2</RangeSelection>
+    </Pane>
+   </Panes>
+   <ProtectObjects>False</ProtectObjects>
+   <ProtectScenarios>False</ProtectScenarios>
+  </WorksheetOptions>
+ </Worksheet>
+</Workbook>

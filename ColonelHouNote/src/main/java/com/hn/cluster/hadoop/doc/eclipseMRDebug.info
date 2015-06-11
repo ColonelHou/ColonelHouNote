@@ -1,0 +1,4 @@
+添加jar到eclipse插件目录 下
+把hadoop安装包解压到本地磁盘上
+配置eclipse的MR路经指向hadoop
+替换winutils.exe

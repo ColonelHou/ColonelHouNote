@@ -1,0 +1,61 @@
+如何求两个数据集的重合 & 不同的数据类型JOIN会失败
+假设有以下两个数据文件：
+[root@localhost ~]# cat 1.txt 
+123
+456
+789
+200
+以及：
+
+[root@localhost ~]# cat 2.txt 
+200
+333
+789
+现在要找出两个文件中，相同的数据有多少行，怎么做？这也就是所谓的求两个数据集的重合。
+用关系操作符JOIN，我们可以达到这个目的。在处理海量数据时，经常会有求重合的需求。所以JOIN是Pig中一个极其重要的操作。
+在本例中，两个文件中有两个相同的数据行：789以及200，因此，结果应该是2。
+我们先来看看正确的代码：
+
+A = LOAD '1.txt' AS (a: int);   
+B = LOAD '2.txt' AS (b: int);
+C = JOIN A BY a, B BY b;
+D = GROUP C ALL;
+E = FOREACH D GENERATE COUNT(C);
+DUMP E;
+解释一下：
+①第一、二行是加载数据，不必多言。
+②第三行按A的第1列、B的第二列进行“结合”，JOIN之后，a、b两列不相同的数据就被剔除掉了。C的数据结构为：
+
+C: {A::a: int,B::b: int}
+C的数据为：
+
+(200,200)
+(789,789)
+③由于我们要统计的是数据行数，所以上面的Pig代码中的第4、5行就进行了计数的运算。
+④如果文件 2.txt 多一行数据“200”，结果会是什么？答案是：结果为3行。这个时候C的数据为：
+
+(200,200)
+(200,200)
+(789,789)
+所以如果你要去除重复的，还需要用DISTINCE对C处理一下：
+
+A = LOAD '1.txt' AS (a: int);
+B = LOAD '2.txt' AS (b: int);
+C = JOIN A BY a, B BY b;
+uniq_C = DISTINCT C;
+D = GROUP uniq_C ALL;
+E = FOREACH D GENERATE COUNT(uniq_C);
+DUMP E;
+这样得到的结果就是2了。
+文章来源：http://www.codelast.com/
+尤其需要注意的是，如果JOIN的两列具有不同的数据类型，是会失败的。例如以下代码：
+
+A = LOAD '1.txt' AS (a: int);   
+B = LOAD '2.txt' AS (b: chararray);
+C = JOIN A BY a, B BY b;
+D = GROUP C ALL;
+E = FOREACH D GENERATE COUNT(C);
+DUMP E;
+在语法上是没有错误的，但是一运行就会报错：
+ERROR org.apache.pig.tools.grunt.Grunt - ERROR 1107: Cannot merge join keys, incompatible types
+这是因为a、b具有不同的类型：int和chararray。

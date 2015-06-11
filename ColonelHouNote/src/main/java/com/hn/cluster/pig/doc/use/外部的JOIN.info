@@ -1,0 +1,61 @@
+初次使用JOIN时，一般人使用的都是所谓的“内部的JOIN”(inner JOIN)，也即类似于 C = JOIN A BY col1, B BY col2 这样的JOIN。Pig也支持“外部的JOIN”(outer JOIN)，下面就举一个例子。
+假设有文件：
+[root@localhost ~]# cat 1.txt 
+1 a
+2 e
+3 v
+4 n
+以及：
+[root@localhost ~]# cat 2.txt 
+9 a
+2 e
+3 v
+0 n
+现在来对这两个文件的第一列作一个outer JOIN：
+grunt> A = LOAD '1.txt' AS (col1: int, col2: chararray);
+grunt> B = LOAD '2.txt' AS (col1: int, col2: chararray);
+grunt> C = JOIN A BY col1 LEFT OUTER, B BY col1;
+grunt> DESCRIBE C;
+C: {A::col1: int,A::col2: chararray,B::col1: int,B::col2: chararray}
+grunt> DUMP C;
+(1,a,,)
+(2,e,2,e)
+(3,v,3,v)
+(4,n,,)
+在outer JOIN中，“OUTER”关键字是可以省略的。从上面的结果，我们注意到：如果换成一个inner JOIN，则两个输入文件的第一、第四行都不会出现在结果中（因为它们的第一列不相同），而在LEFT OUTER JOIN中，文件1.txt的第一、四行却被输出了，所以这就是LEFT OUTER JOIN的特点：对左边的记录来说，即使它与右边的记录不匹配，它也会被包含在输出数据中。
+文章来源：http://www.codelast.com/
+同理可知RIGHT OUTER JOIN的功能——把上面的 LEFT 换成 RIGHT，结果如下：
+
+(,,0,n)
+(2,e,2,e)
+(3,v,3,v)
+(,,9,a)
+可见，与左边的记录不匹配的右边的记录被保存了下来，而左边的记录没有保存下来（两个逗号表明其为空），这就是RIGHT OUTER JOIN的效果，与我们想像的一样。
+有人会问，OUTER JOIN在实际中可以用来做什么？举一个例子：可以用来求“不在某数据集中的那些数据（即：不重合的数据）”。还是以上面的两个数据文件为例，现在我要求出 1.txt 中，第一列不在 2.txt 中的第一列的那些记录，肉眼一看就知道，1和4这两个数字在 2.txt 的第一列里没有出现，而2和3出现了，因此，我们要找的记录就是：
+
+1 a
+4 n
+要实现这个效果，Pig代码及结果为：
+grunt> A = LOAD '1.txt' AS (col1: int, col2: chararray);
+grunt> B = LOAD '2.txt' AS (col1: int, col2: chararray);
+grunt> C = JOIN A BY col1 LEFT OUTER, B BY col1;        
+grunt> DESCRIBE C;                 
+C: {A::col1: int,A::col2: chararray,B::col1: int,B::col2: chararray}
+grunt> D = FILTER C BY (B::col1 is null); 
+grunt> E = FOREACH D GENERATE A::col1 AS col1, A::col2 AS col2;
+grunt> DUMP E;
+(1,a)
+(4,n)
+可见，我们确实找出了“不重合的记录”。在作海量数据分析时，这种功能是极为有用的。
+最后来一个总结：
+假设有两个数据集（在1.txt和2.txt中），分别都只有1列，则如下代码：
+
+A = LOAD '1.txt' AS (col1: chararray);
+B = LOAD '2.txt' AS (col1: chararray);  
+C = JOIN A BY col1 LEFT OUTER, B BY col1;
+D = FILTER C BY (B::col1 is null);
+E = FOREACH D GENERATE A::col1 AS col1;                 
+DUMP E;
+计算结果为：在A中，但不在B中的记录。
+
+JOIN的优化http://www.codelast.com/?p=4249

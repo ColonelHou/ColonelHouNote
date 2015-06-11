@@ -1,0 +1,101 @@
+http://www.cnblogs.com/Scott007/archive/2013/05/30/3108928.html
+文件在HDFS里进行读取和存储的时候大都是以block的形式存在和表现。每个文件都可能会有很多个block，每个block又会根据配置文件中的replica的value设置有着多个备份。在NN(NameNode)中，称之为block的这些个东东，在DN(DataNode)中通常叫做replica(都是指的同一种东东)。Block在NN中和DN中随着操作的不同，会有多种状态，这些状态因不同的操作而触发，又因不同的操作而发生转变。下面就分别分析block在NN中和DN中的各种状态以及状态之间的转变。
+
+1 DN端的block状态
+    DN端block状态都保存在DN的内存之中，目前的设计里共有五种状态。
+
+1.1 FINALIZED状态
+    处于finalized状态的replica已经完成了其所有字节的写，replica的内容和长度都已固定，除非此replica响应append事件来reopen继续追加写，否则此replica不会被写入新的字节。并且，这种类型的replica其真实的replica data和meta data是相匹配的。此replica的存储在其余DN的备份也有着相同的block id和字节。但是有一点需要注意，这种replica的时间戳GS(generation stamp)不是一成不变的，当进行错误块恢复的时候，有可能会发生变化(变为块恢复时的时间)。
+
+1.2 RWB状态
+    RWB是Replica Being Written to的缩写，一旦一个replica被创建或者之前的replica被追加数据，那么此replica就会变为RWB状态，这意味着这个replica正在被写入数据(是现在进行时哦，亲！)。这个块通常是一个正在被操作的文件(文件流未被关闭)的最后一个块。正因为处在“被写入数据”的状态，所以此replica的长度还未 确定，并且存储在磁盘上的此块的replica data和meta data也不一定是匹配的。此块的存储在其余DN上的replica可能有着不同的字节内容和长度。但是，此块的数据还是能够被reader看到的(读到的不一定是所有的数据)。为了防止意外，处于RWB状态的replica也要尽可能的持久化。
+
+1.3 RWR状态
+    RWR是Replica Waiting to be Recovered的缩写，当DN死掉或者重启的时候，所有上述属于RBW状态的replica都会变成RWR状态。RWR状态的replica不会出现在传输数据的pipeline(通道，读和写等操作中，用此来进行传输block)中，因此也不会接收任何新的字节写入。这些状态的replica或者最终变为过期的数据，或者当客户端挂掉的时候参与到租约恢复中去。
+
+1.4 RUR状态
+    当一个租约(客户端向NN申请的对一个文件的控制)过期并且发起包括此replica的块恢复机制之后，这个replica就会变为RUR状态，RUR就是Replica Under Recovery的缩写。
+
+1.5 TEMPORARY状态
+    顾名思义，这个Temporary的replica就是处于under construction的块，它是当块复制或者集群做均衡操作时创建的临时块。这种状态的块和RBW状态的块有很多类似的地方，但是有一点显著的不同，就是其数据是不能被reader看到的。当块创建失败或者DN重启的时候，此状态的replica都会被删除掉。
+
+    在DN端的硬盘存储的层次上，有三个子目录：current、tmp、rbw。current用来存储处于finalized状态的replica，tmp用来存储temporary状态的replica，rbw用来存储rbw、rur、rwr状态的replica。并且：
+
+(1)当块被客户端请求首次创建的时候，会被放入rbw目录下;
+
+(2)当块是因为复制或者均衡操作被创建的时候，会被放入tmp目录;
+
+(3)一旦一个块被finalized，就被移动到current目录;
+
+(4)当数据节点重启时，tmp目录下的replica就被清空，rbw目录下的replica就转变为rwr状态，current目录下的replica变为finalized状态;
+
+(5)当DN升级的时候，current和rbw目录下的块都会被保存在快照中。
+
+2 NN端的block状态
+    NN端的block有四种状态。
+
+2.1 UnderConstruction状态
+    一旦一个块被创建或者被追加数据，就会处于underConstruction状态，此时，数据库正在被写入新的数据。这样的块是当前正处于被写状态的文件的的最后一个块。它的块长度和GS都还没有最终确定，同DN端的rwb状态一样，此数据块对reader来说是可见的。并且，此类型的块还会保持对写入其本身的数据通道和对应的RWR状态的replica的追踪，以防Client挂掉。
+
+2.2 UnderRecovery状态
+    当一个文件的租约过期时，如果此文件的最后一个block处于underConstruction状态，此块就会当块恢复开始的时候变为underRecovery状态。
+
+2.3 Committed状态
+    一个处于committed状态的block，其内容和时间戳GS都已经确定，但是在DN中还没有一个replica和此committed的block有着相同的字节和GS。除非进行append追加操作，否则此committed状态的block的字节和GS都不会再发生变化。为了响应reader的请求，committed状态的block仍然会持有rbw状态的replica的地址和追踪已经变为finalized状态的replica的长度和GS。当客户端调用NN的close file或add new block时，操作流未关闭的文件的处于underConstruction状态的replica会被转变为committed状态。如果最后一个block处于committed状态，那么此block对应的文件是无法被关闭的，客户端必须要重试。AddBlock和close将会扩展到包含最后一个block的GS和长度。
+
+2.4 Complete状态
+    一个处于complete状态的block，其长度和GS都是确定的，并且NN能够找到DN端GS和长度都对应的处于finalized状态的replica。Complete状态的block值会保持finalized状态的replica的地址。只有当所有的块都变为complete状态了，对应的文件才能被关闭。
+
+    和DN端的replica的状态不同，NN端的block的状态不会被持久化到磁盘上，当NN重启的时候，未关闭的文件的最后一个block会变为underConstruction状态，其余的块都变为complete状态。
+
+3 replica在DN中的状态变化
+ 
+
+(1)新的replica被创建
+
+　　(1.1)如果是客户端发起，则replica以rbw状态开始；
+
+　　(1.2)如果是NN的命令做块复制或者均衡，则replica以temporary状态开始；
+
+(2)当DN重启时，rbw将转换为rwr状态；
+
+(3)当租约过期时，replica进行块恢复时，其状态变为rur状态；
+
+(4)客户端关闭时，replica若成功恢复，或者replica成功复制，都会将状态变为finalized；
+
+(5)块进行错误恢复时，GS会变化；
+
+4 block在NN中的状态变化
+ 
+
+(1)当新的block被创建的时候，总是处于underConstruction状态
+
+　　(1.1)或者是客户端发起addBlock事件，新增block到一个文件；
+
+　　(1.2)或者当客户端发起追加数据的操作，但是最后一个块已经满了；
+
+(2)追加操作可能引起block的状态从complete变为underConstruction状态；
+
+(3)当addBlock或者关闭文件的时候，
+
+　　(3.1)最后一个block或者变为complete状态(当此块已经在DN有匹配的GS和长度的replica时)，或者变为committed状态；
+
+　　(3.2)addBlock必等到倒数第二个block变为complete状态；
+
+　　(3.3)如果最后两个block不是complete，则文件无法关闭；
+
+(4)当一个租约过期的时候，租约恢复会将block的underConstruction状态变为underRecovery状态
+
+　　(4.1)块恢复会将导致underRecovery的block发生：
+
+　　　　(4.1.1)Removed，如果所有的replica长度都为0；
+
+　　　　(4.1.2)Committed，如果块恢复成功，并且此块在DN没有GS和长度都匹配的replica；
+
+　　　　(4.1.3)Complete，如果块恢复成功，并且此块在DN有GS和长度都匹配的replica；
+
+　　(4.2)租约恢复会强制一个committed状态的block变为complete状态；
+
+(5)block的状态不会持久化在磁盘中，当NN重启后，未关闭文件的最后一个block都会变成underConstruction，其余的都是complete状态。需要注意的是，如果文件的最后一个block是complete状态或者committed状态，当NN重启的时候，上述两个状态的block也会变为underConstruction状态。如果客户端还存活的话，客户端会再次进行finalized，否则，当租约过期的时候，块恢复会finalized一遍。
+
+(6)一个block一旦变为了committed状态或者complete状态，所有的相关的存储在其他DN上的对应的replica都会有相同的GS，并且都是finalized状态。当一个block是underConstruction状态，那么就意味着此块有多个“代”的block存在于集群中。

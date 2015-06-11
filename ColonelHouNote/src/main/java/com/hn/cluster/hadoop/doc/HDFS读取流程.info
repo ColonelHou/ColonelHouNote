@@ -1,0 +1,14 @@
+1.HDFS Client会先去联系NameNode，询问file.txt总共分为几个Block而且这些Block分别存放在哪些DataNode上。
+2.由于每个Block都会存在几个副本，所以NameNode会把file.txt文件组成的Block所对应的所有DataNode列表都返回给
+  HDFS Client。
+3.HDFS Client会选择DataNode列表里的第一个DataNode去读取对应的Block，比如由于Block A存储在DataNode1，
+  2，7，那么HDFS Client会到DataNode1去读取Block A；Block C存储在DataNode，7，8，9，
+    那么HDFS Client就回到DataNode7去读取Block C。
+  
+NN给告诉客户端那个DN最近
+
+一座楼是一数据中心——》机架(层)
+读数据就相当于去租房子：
+	老板(NN)有一座20F楼(单元是DN), 某天我和同学(Cli)去租房子(读数据), 要求找面向南的 几间房子(DATA块[各层都会有几间]),
+老板检查是否此条件房子以及我是否合格租房(权限查看), 审核通过后老板给我 房间钥匙及房间号(DATA块)让我去自, 看房子完成…
+ 

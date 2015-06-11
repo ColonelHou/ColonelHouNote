@@ -1,0 +1,2 @@
+http://ju.outofmemory.cn/entry/86420
+select sid,collect_set(class_id)[0] from table2 group by sid;

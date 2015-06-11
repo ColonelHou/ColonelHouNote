@@ -1,0 +1,27 @@
+二、常见使用
+1、远程拷贝文件
+从server1拷贝文件到server2上。需要先在server2上，用nc激活监听，server2上运行：
+
+引用[root@hatest2 tmp]# nc -lp 1234 > install.log
+
+server1上运行：
+
+引用[root@hatest1 ~]# ll install.log
+-rw-r--r--   1 root root 39693 12月 20   2007 install.log
+[root@hatest1 ~]# nc -w 1 192.168.228.222 1234 < install.log
+
+
+
+
+
+6、聊天
+nc还可以作为简单的字符下聊天工具使用，同样的，server2上需要启动监听：
+
+[root@hatest2 tmp]# nc -lp 1234
+
+
+server1上传输：
+
+[root@hatest1 ~]# nc 192.168.228.222 1234
+
+这样，双方就可以相互交流了。使用Ctrl+D正常退出。

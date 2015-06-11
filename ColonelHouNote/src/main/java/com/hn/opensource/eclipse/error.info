@@ -1,0 +1,4 @@
+java.lang.OutOfMemoryError: PermGen space
+eclipse.ini
+-XX:PermSize=64M 
+-XX:MaxPermSize=128M

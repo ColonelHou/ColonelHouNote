@@ -1,0 +1,2 @@
+只需在Pig脚本的开头加上一句：
+set job.priority HIGH;

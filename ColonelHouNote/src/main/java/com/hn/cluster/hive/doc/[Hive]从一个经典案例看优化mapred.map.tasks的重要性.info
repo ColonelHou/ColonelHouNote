@@ -1,0 +1,26 @@
+http://blog.sina.com.cn/s/blog_6ff05a2c0101aqvv.html
+我所在公司所使用的生产Hive环境的几个参数配置如下：
+dfs.block.size=268435456
+hive.merge.mapredfiles=true
+hive.merge.mapfiles=true
+hive.merge.size.per.task=256000000
+mapred.map.tasks=2 
+
+因为合并小文件默认为true，而dfs.block.size与hive.merge.size.per.task的搭配使得合并后的绝大部分文件都在300MB左右。
+
+CASE 1：
+
+现在我们假设有3个300MB大小的文件，那么goalsize = min(900MB/2,256MB) = 256MB (具体如何计算map数请参见http://blog.sina.com.cn/s/blog_6ff05a2c010178qd.html)
+所以整个JOB会有6个map，其中3个map分别处理256MB的数据，还有3个map分别处理44MB的数据。
+这时候木桶效应就来了，整个JOB的map阶段的执行时间不是看最短的1个map的执行时间，而是看最长的1个map的执行时间。所以，虽然有3个map分别只处理44MB的数据，可以很快跑完，但它们还是要等待另外3个处理256MB的map。显然，处理256MB的3个map拖了整个JOB的后腿。
+
+CASE 2：
+
+如果我们把mapred.map.tasks设置成6，再来看一下有什么变化：
+goalsize = min(900MB/6,256MB) = 150MB
+整个JOB同样会分配6个map来处理，每个map处理150MB的数据，非常均匀，谁都不会拖后腿，最合理地分配了资源，执行时间大约为CASE 1的59%(150/256) 
+
+案例分析：
+
+虽然mapred.map.tasks从2调整到了6，但是CASE 2并没有比CASE 1多用map资源，同样都是使用6个map。而CASE 2的执行时间约为CASE 1执行时间的59%。
+从这个案例可以看出，对mapred.map.tasks进行自动化的优化设置其实是可以很明显地提高作业执行效率的。

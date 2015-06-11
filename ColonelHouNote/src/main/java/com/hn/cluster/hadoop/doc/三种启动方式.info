@@ -1,0 +1,9 @@
+第一种：项目中使用的 hadoop-daemon.sh  yarn-daemon.sh
+sbin/hadoop-daemon.sh start namenode
+sbin/hadoop-daemon.sh start datanode
+sbin/hadoop-daemon.sh start secondarynamenode
+sbin/yarn-daemon.sh start resourcemanager
+sbin/yarn-daemon.sh start nodemanager
+sbin/mr-jobhistory-daemon.sh start historyserver
+第二种：start-dfs.sh start-yarn.sh
+第三种：start-all.sh 不推荐

@@ -1,0 +1,32 @@
+[hadoop@hadoop ]$hdfs dfs -cat /hive/hdfs/hdfs.txt
+jim,25,20141201
+tom,27,20141101
+lily,29,20141001
+luly,23,20141501
+-----------------------------------------------------------------------------------------------------
+hive (testdb)> create table loadFromHdfsTbl(name string, age int, id string)ROW FORMAT delimited fields terminated by ',' stored as textfile;
+OK
+Time taken: 0.093 seconds
+-----------------------------------------------------------------------------------------------------
+hive (testdb)> load data inpath '/hive/hdfs/hdfs.txt' into table loadFromHdfsTbl;
+Loading data to table testdb.loadfromhdfstbl
+Table testdb.loadfromhdfstbl stats: [numFiles=1, numRows=0, totalSize=66, rawDataSize=0]
+OK
+Time taken: 0.737 seconds
+-----------------------------------------------------------------------------------------------------
+hive (testdb)> select * from loadFromHdfsTbl;
+OK
+loadfromhdfstbl.name    loadfromhdfstbl.age     loadfromhdfstbl.id
+jim     25      20141201
+tom     27      20141101
+lily    29      20141001
+luly    23      20141501
+Time taken: 0.076 seconds, Fetched: 4 row(s)
+-----------------------------------------------------------------------------------------------------
+从别的表中查询出相应的数据并导入到Hive表中
+insert into table test partition (age='25')select id, name, tel from wyp; 
+在创建表的时候通过从别的表中查询出相应的记录并插入到所创建的表中
+create table test4 as select id, name, tel from wyp;
+
+转自：
+http://www.iteblog.com/archives/tag/hive的那些事
