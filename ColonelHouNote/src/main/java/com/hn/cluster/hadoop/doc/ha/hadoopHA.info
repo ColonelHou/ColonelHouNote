@@ -11,3 +11,4 @@ zkServer.sh start
 6.启动YARN(在namenode1和namenode2上执行)tart-yarn.sh
 7.端口：http://namenode1:50070和http://namenode2:50070查看namenode分别为Active和Standby
 http://namenode1:8188, http://namenode2:8188查看状态
+mr-jobhistory-daemon.sh start historyserver
