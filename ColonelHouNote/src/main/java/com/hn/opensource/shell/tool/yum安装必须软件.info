@@ -6,6 +6,7 @@ yum install make
 yum install cmake
 yum install openssl-devel
 yum install ncurses-devel
+yum install git
 
 yum install php php-devel php-mysql php-gd php-imap php-ldap php-odbc php-pear php-xml php-xmlrpc php-mbstring
 yum groupinstall “Development tools”
