@@ -1,4 +1,4 @@
-package com.hn.work.traceMonitor;
+package com.hn.work.sendRequest;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -6,10 +6,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 /**
- * Calendar: the Calendar class of JAVA.util TimeString: 20121225145523234 :
- * YYYYMMDDHHmmssSSS DateString: 20121225 : YYYYMMDD DisplayString : yyyy-MM-dd
  * 
- * @author cmcc xuzhao
  */
 public class DateUtilities
 {

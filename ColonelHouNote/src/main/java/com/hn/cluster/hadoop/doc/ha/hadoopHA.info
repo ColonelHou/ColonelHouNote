@@ -12,3 +12,6 @@ zkServer.sh start
 7.端口：http://namenode1:50070和http://namenode2:50070查看namenode分别为Active和Standby
 http://namenode1:8188, http://namenode2:8188查看状态
 mr-jobhistory-daemon.sh start historyserver
+
+hdfs dfs -copyFromLocal /usr/local/hadoop-2.6.0-cdh5.4.0/etc/hadoop/core-site.xml /data/input
+hadoop jar /usr/local/hadoop-2.6.0-cdh5.4.0/share/hadoop/mapreduce2/hadoop-mapreduce-examples-2.6.0-cdh5.4.0.jar wordcount /data/input/core-site.xml /data/output

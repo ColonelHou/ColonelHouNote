@@ -1,4 +1,4 @@
-package com.hn.work.traceMonitor;
+package com.hn.work.sendRequest;
 
 import java.io.IOException;
 import java.util.Calendar;
@@ -9,13 +9,13 @@ import org.apache.commons.httpclient.HttpHost;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.log4j.Logger;
 
-public class ServerOnlineMonitor
+public class HttpClientSendRequest
 {
 
-	private static Logger log = Logger.getLogger(ServerOnlineMonitor.class);
+	private static Logger log = Logger.getLogger(HttpClientSendRequest.class);
 
 	// private static String WINDOWS_ONLINE_TEST_LOG =
-	// "C:\\Users\\cmcc\\Desktop\\online_history.log";
+	// "C:\\Users\\Colonel.Hou\\Desktop\\online_history.log";
 
 	public static void main(String args[])
 	{
@@ -27,13 +27,13 @@ public class ServerOnlineMonitor
 	{
 		boolean result = false;
 		// log.info("broadCastToService start");
-		// String url = "http://192.1168.1.12:8080/TRACEProbeService/accept";
-		// String url = "http://192.1168.1.12:8080/TRACEProbeService/accept";
-		String url = "http://localhost:8080/HadoopSlaveActivity/accept";
+		// String url = "http://192.1168.1.12:8080/WebPro/accept";
+		// String url = "http://192.1168.1.12:8080/WebPro/accept";
+		String url = "http://localhost:8080/WebPro/accept";
 		// String url =
-		// "http://192.1168.1.12:8080/TRACEProbeServiceLogSlave/accept";
+		// "http://192.1168.1.12:8080/WebPro/accept";
 		// String url =
-		// "http://192.1168.1.12:8080/TRACEProbeServiceSlaveActivity/accept";
+		// "http://192.1168.1.12:8080/WebPro/accept";
 		HttpClient client = new HttpClient();
 		// 设置代理开始。如果代理服务器需要验证的话，可以修改用户名和密码
 		// client.getCredentialsProvider().setCredentials(new
@@ -47,21 +47,11 @@ public class ServerOnlineMonitor
 
 		// \"52\":\"appStore\",
 		postRequest
-				.setParameter(
-						"content",
-						"{\"21\":{\"8\":[{\"6\":\"BCE53DA4-0AB8-4779-BB1C-A"
-								+ Math.random()
-								+ "EC0D0B7F0521392194406419\",\"9\":\"20140304164006419\"}],\"11\":[{\"1\":\"11780\",\"6\":\"BCE53DA4-0AB8"
-								+ Math.random()
-								+ "-4779-BB1C-AEC0D0B7F0521392194406419\",\"4\":[[\"activitiesView\",\"1544\"]],\"9\":\"20140304164018199\"}],\"15\":[{\"17\":\"自定义lable\",\"16\":\"tag=100\",\"50\":\"attribute\",\"9\":\"20140212164014216\",\"18\":\"1\",\"6\":\"BCE53DA4-0AB8-4779-BB1C-AEC0D0B7F0521392194406419\"}]},\"19\":{\"32\":\"iphone\",\"25\":\"BCE53DA4-0AB8-4779-BB1C-AEC0D0B7F052\",\"33\":1,\"26\":\"unknown\",\"41\":\"WIFI\",\"34\":\"iphone\",\"27\":\"iPhone Simulator\",\"42\":\"unknown\",\"35\":\"6.1\",\"28\":\"apple\",\"43\":\"unknown\",\"36\":\"unknown\",\"29\":\"1.0\",\"51\":\"iosTest\",\"44\":\"37.785834\",\"37\":\"en\",\"5\":\"139320984651624c7385dd004dad5bd4\",\"45\":\"-122.406417\",\"38\":8,\"46\":\"unknown\",\"39\":\"480*320\",\"31\":0,\"24\":\"BCE53DA4-0AB8-4779-BB1C-AEC0D0B7F052\"}}");
+				.setParameter("josn");
 		try
 		{
 			client.executeMethod(postRequest);
-		} catch (HttpException e)
-		{
-			log.error("broadCastToService http execetion ");
-			e.printStackTrace();
-		} catch (IOException e)
+		} catch (Exception e)
 		{
 			log.error("broadCastToService io execetion ");
 			e.printStackTrace();
